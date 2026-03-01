@@ -1,42 +1,48 @@
-<!DOCTYPE html>
-<html lang="fr" class="bg-slate-50">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Politique de Confidentialité - FinanceZen</title>
-    @vite(['resources/css/app.css'])
-</head>
-<body class="font-sans text-slate-800 antialiased p-8 md:p-20">
-    <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-sm border border-slate-200 p-10 md:p-14">
-        <a href="{{ route('welcome') }}" class="inline-flex items-center gap-2 text-primary font-bold hover:underline mb-8">
-            ← Retour à l'accueil
-        </a>
-        <h1 class="text-4xl font-black text-slate-900 mb-8">Politique de Confidentialité</h1>
-        
-        <div class="prose prose-slate max-w-none">
-            <p class="text-slate-500 mb-8">Dernière mise à jour : 28 Février 2026</p>
+<x-public-layout :title="'Politique de Confidentialité — FinanceZen'">
+    <section class="py-16 md:py-24 px-4 sm:px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="mb-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">Politique de Confidentialité</h1>
+                <p class="text-slate-500">Dernière mise à jour : 1er Mars 2026</p>
+            </div>
 
-            <h2 class="text-xl font-bold mt-8 mb-4">1. Collecte des données</h2>
-            <p>Nous collectons les informations suivantes lorsque vous utilisez FinanceZen : Nom, prénom, adresse e-mail, données de transaction financière saisies manuellement, et informations de connexion (mot de passe haché).</p>
-            
-            <h2 class="text-xl font-bold mt-8 mb-4">2. Utilisation des données</h2>
-            <p>Vos données sont exclusivement utilisées pour le fonctionnement du service FinanceZen à savoir :</p>
-            <ul class="list-disc pl-5 mb-4 space-y-2 text-slate-600">
-                <li>Générer vos rapports financiers et graphiques (budgets, dettes, épargne).</li>
-                <li>Authentifier votre accès.</li>
-                <li>Gérer votre abonnement (via FedaPay de manière sécurisée).</li>
-                <li>Vous envoyer des notifications systèmes importantes (reçus, alertes de budget).</li>
-            </ul>
-            
-            <h2 class="text-xl font-bold mt-8 mb-4">3. Protection de vos données</h2>
-            <p>FinanceZen met en œuvre toutes les mesures techniques et organisationnelles nécessaires pour garantir la sécurité de vos données financières. Nous ne vendons, ni ne louons, ni ne partageons vos données financières à des tiers à des fins publicitaires.</p>
-            
-            <h2 class="text-xl font-bold mt-8 mb-4">4. Vos droits</h2>
-            <p>Conformément à la réglementation (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez supprimer définitivement votre compte et l'intégralité de vos données directement depuis l'interface de "Mon Profil" > "Zone dangereuse".</p>
-            
-            <h2 class="text-xl font-bold mt-8 mb-4">5. Contact</h2>
-            <p>Pour toute demande relative à la confidentialité de vos données : privacy@financezen.com</p>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 md:p-12 space-y-8">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="database" class="w-5 h-5 text-primary"></i> 1. Collecte des données</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed">Nous collectons les informations suivantes lorsque vous utilisez FinanceZen : nom, prénom, adresse e-mail, numéro de téléphone, données de transactions financières saisies manuellement, et informations de connexion (mot de passe protégé par hachage bcrypt).</p>
+                </div>
+                <hr class="border-slate-100">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-primary"></i> 2. Utilisation des données</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-3">Vos données sont exclusivement utilisées pour le fonctionnement du service FinanceZen :</p>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> Générer vos rapports financiers et graphiques (budgets, dettes, épargne).</li>
+                        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> Authentifier votre accès de manière sécurisée.</li>
+                        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> Gérer votre abonnement via FedaPay (paiement sécurisé).</li>
+                        <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> Vous envoyer des notifications système importantes (reçus, alertes de budget).</li>
+                    </ul>
+                </div>
+                <hr class="border-slate-100">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5 text-primary"></i> 3. Protection de vos données</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed">FinanceZen met en oeuvre toutes les mesures techniques et organisationnelles nécessaires pour garantir la sécurité de vos données financières. Vos mots de passe sont hachés avec l'algorithme bcrypt. Nous ne vendons, ne louons, ni ne partageons vos données financières à des tiers à des fins publicitaires ou commerciales.</p>
+                </div>
+                <hr class="border-slate-100">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="user-check" class="w-5 h-5 text-primary"></i> 4. Vos droits</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed">Conformément à la réglementation applicable (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez supprimer définitivement votre compte et l'intégralité de vos données directement depuis l'interface "Mon Profil" dans la section "Zone dangereuse".</p>
+                </div>
+                <hr class="border-slate-100">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="cookie" class="w-5 h-5 text-primary"></i> 5. Cookies</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed">FinanceZen utilise uniquement des cookies techniques strictement nécessaires au fonctionnement de l'application (session de connexion, token CSRF). Aucun cookie publicitaire ou de suivi tiers n'est utilisé.</p>
+                </div>
+                <hr class="border-slate-100">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="mail" class="w-5 h-5 text-primary"></i> 6. Contact</h2>
+                    <p class="text-sm text-slate-600 leading-relaxed">Pour toute demande relative à la confidentialité de vos données, contactez-nous à l'adresse : <span class="font-bold text-slate-800">info@financezen.miguelmissetcho.com</span></p>
+                </div>
+            </div>
         </div>
-    </div>
-</body>
-</html>
+    </section>
+</x-public-layout>
