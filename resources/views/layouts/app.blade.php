@@ -62,7 +62,7 @@
                     <x-nav-link href="{{ route('profile.edit') }}" :active="request()->routeIs('profile.*')" icon="user">Profil</x-nav-link>
                 </div>
 
-                @if(auth()->user()->isAdmin())
+                @if(auth()->check() && auth()->user()->isAdmin())
                 <div class="pt-4 mt-4 border-t border-slate-700/50">
                     <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Administration</p>
                     <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.*')" icon="shield">Panel Admin</x-nav-link>
