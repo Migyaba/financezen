@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
+use App\Models\SavingsGoal;
+use App\Models\SavingsContribution;
+use Illuminate\Http\Request;
+
+class SavingsController extends Controller
+{
+    public function index()
+    {
+        $goals = auth()->user()->savingsGoals()->withSum('contributions', 'amount')->get();
+        $totalSaved = $goals->sum('current_amount');
+        $activeGoals = $goals->where('status', 'active')->count();
+        $achievedGoals = $goals->where('status', 'achieved')->count();
+
+        return view('user.savings.index', compact('goals', 'totalSaved', 'activeGoals', 'achievedGoals'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'target_amount' => 'required|numeric|min:1',
+            'monthly_target' => 'nullable|numeric|min:0',
+            'target_date' => 'nullable|date',
+            'type' => 'required|in:emergency_fund,investment,project,other',
+            'icon' => 'nullable|string',
+            'color' => 'nullable|string|max:7',
+        ]);
+
+        $validated['status'] = 'active';
+        $validated['current_amount'] = 0;
+
+        auth()->user()->savingsGoals()->create($validated);
+
+        return back()->with('success', 'Objectif d\'épargne créé avec succès.');
+    }
+
+    public function show(SavingsGoal $savingsGoal)
+    {
+        $savingsGoal->load(['contributions' => fn($q) => $q->orderBy('contribution_date')]);
+
+        $chartData = collect([
+            ['date' => $savingsGoal->created_at->format('d/m/Y'), 'amount' => 0]
+        ]);
+
+        $current = 0;
+        foreach ($savingsGoal->contributions as $contribution) {
+            $current += $contribution->amount;
+            $chartData->push([
+                'date' => $contribution->contribution_date->format('d/m/Y'),
+                'amount' => $current
+            ]);
+        }
+
+        return view('user.savings.show', compact('savingsGoal', 'chartData'));
+    }
+
+    public function addContribution(Request $request, SavingsGoal $savingsGoal)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'contribution_date' => 'required|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $validated['savings_goal_id'] = $savingsGoal->id;
+        $validated['user_id'] = auth()->id();
+
+        SavingsContribution::create($validated);
+
+        // Update current amount
+        $savingsGoal->current_amount += $validated['amount'];
+        if ($savingsGoal->current_amount >= $savingsGoal->target_amount) {
+            $savingsGoal->status = 'achieved';
+        }
+        $savingsGoal->save();
+
+        return back()->with('success', 'Contribution enregistrée.');
+    }
+}
