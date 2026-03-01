@@ -1,59 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <div style="background-color: #0f172a; padding: 2rem; border-radius: 1rem; text-align: center;">
+    <h1 style="color: white; font-size: 3rem; margin-bottom: 0;">💸 FinanceZen</h1>
+    <p style="color: #94a3b8; font-size: 1.2rem; margin-top: 0.5rem;">La Révolution Budgétaire Personnelle</p>
+  </div>
 </p>
 
-## About Laravel
+## À propos de FinanceZen
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**FinanceZen** est une application web moderne (SaaS) conçue pour aider les particuliers, entrepreneurs, et freelances à reprendre le contrôle de leurs finances personnelles. Fini les fichiers Excel complexes, FinanceZen propose une interface claire, des tableaux de bord interactifs et des outils de planification financière intuitifs pour bâtir sa prospérité financière jour après jour.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+L'application intègre un système d'abonnement complet géré via **FedaPay** avec des rappels automatiques et une architecture multi-devises.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fonctionnalités Principales
 
-## Learning Laravel
+*   📊 **Tableau de Bord Global :** Vue d'ensemble de la santé financière (Revenus, Dépenses, Dette restante, Épargne).
+*   💰 **Gestion des Budgets :** Définition de budgets par catégorie (Loyer, Courses, Loisirs) avec suivi et alertes en direct.
+*   💳 **Transactions Rapides :** Saisie ultra-rapide des flux avec catégorisation automatique.
+*   📉 **Éradication des Dettes :** Planification des remboursements (Crédits, prêts personnels) et suivi visuel de l'avancement.
+*   🎯 **Objectifs d'Épargne :** Fixation de cibles (Voyage, Voiture, Fonds d'urgence) avec barre de progression.
+*   📑 **Rapports Analytiques :** Graphiques visuels précis sur les habitudes de dépenses et exports (PDF/CSV).
+*   🛍️ **Système d'Abonnement SaaS :** Intégration FedaPay (Mobile Money & CB), avec formules mensuelles/annuelles, période d'essai de 7 jours et renouvellement automatique.
+*   📱 **Interface 100% Responsive :** Utilisable fluidement sur Mobile, Tablette et Desktop.
+*   🛡️ **Mode Administrateur :** Un panneau de contrôle exclusif pour gérer les utilisateurs, surveiller les revenus (MRR, Chiffre d'Affaires) et dépanner les abonnements.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠️ Stack Technique
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+*   **Backend :** [Laravel 11](https://laravel.com) (PHP 8.2+)
+*   **Base de Données :** PostgreSQL
+*   **Frontend :** Blade Templates, [Tailwind CSS 3](https://tailwindcss.com) & [Alpine.js](https://alpinejs.dev)
+*   **Paiements :** API FedaPay
+*   **Déploiement Continu :** GitHub Actions -> Transfert FTP sécurisé (o2switch)
 
-## Laravel Sponsors
+## 🚀 Installation & Lancement en Local
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prérequis
+* PHP 8.2 ou supérieur
+* Composer
+* Node.js & NPM
+* PostgreSQL
 
-### Premium Partners
+### Étapes d'installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. **Cloner le projet**
+```bash
+git clone https://github.com/Migyaba/financezen.git
+cd financezen
+```
 
-## Contributing
+2. **Installer les dépendances PHP et Node**
+```bash
+composer install
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Configurer l'environnement**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+*Configurez ensuite votre fichier `.env` avec vos identifiants PostgreSQL locaux et vos clés API de test FedaPay (`FEDAPAY_SECRET_KEY`, `FEDAPAY_PUBLIC_KEY`, etc.).*
 
-## Code of Conduct
+4. **Préparer la Base de données**
+```bash
+# Lancer les migrations pour créer les tables
+php artisan migrate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Lancer le seeder pour insérer des catégories de budget par défaut
+php artisan db:seed
+```
 
-## Security Vulnerabilities
+5. **Compiler les ressources frontend (CSS/JS)**
+```bash
+# Pour le développement en temps réel
+npm run dev
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Ou pour simuler la production
+npm run build
+```
 
-## License
+6. **Lancer le serveur de développement Laravel**
+```bash
+php artisan serve
+```
+Le projet sera accessible sur `http://localhost:8000`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ⚙️ Déploiement en Production (CI/CD o2switch)
+
+Ce projet est configuré pour se déployer **automatiquement** à chaque `push` sur la branche `main` via les Actions GitHub, vers un hébergement standard cPanel tel que o2switch.
+
+### Configuration des Secrets GitHub
+Pour que le déploiement fonctionne, vous devez déclarer 3 variables secrètes dans votre dépôt GitHub *(Settings > Secrets and variables > Actions)* :
+* `FTP_SERVER` (l'IP ou le nom de votre serveur d'hébergement o2switch)
+* `FTP_USERNAME` (votre identifiant cPanel)
+* `FTP_PASSWORD` (votre mot de passe cPanel)
+
+Dès qu'un code est validé sur `main`, GitHub se connecte en FTP, supprime les exceptions, compile le build Vite, et pousse les nouveautés dans `/financezen.miguelmissetcho.com/`.
+
+*(N'oubliez pas d'exécuter `php artisan migrate` manuellement dans le Terminal o2switch lors de la première installation).*
+
+## ⏱️ Tâches Planifiées (Cron Jobs)
+
+FinanceZen utilise le planificateur de tâches de Laravel pour gérer les expirations d'abonnement et l'envoi d'emails. Sur votre serveur de production, vous devez ajouter cette tâche CRON globale s'exécutant **chaque minute** (`* * * * *`) :
+
+```bash
+cd /chemin/vers/votre/dossier/financezen && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**Tâches internes exécutées automatiquement par Laravel :**
+* `financezen:cleanup-trials-subs` : À minuit `00:05`, détecte et coupe tous les comptes dont l'abonnement ou la période d'essai est arrivée à terme.
+* `financezen:send-reminders` : À `08:15` tous les jours, envoie des emails d'alerte aux utilisateurs (J-3 fin d'essai, J-1 coupure imminente, J-5 renouvellement, etc.).
+
+## 👨‍💻 Créateur
+
+Développé par **Miguel M.** pour révolutionner l'approche de la budgétisation.
+
+---
+*Ce projet est une solution complète, de l'inscription de l'utilisateur jusqu'au reversement transparent des abonnements dans la comptabilité de l'administrateur.*
