@@ -1,118 +1,130 @@
-<p align="center">
-  <div style="background-color: #0f172a; padding: 2rem; border-radius: 1rem; text-align: center;">
-    <h1 style="color: white; font-size: 3rem; margin-bottom: 0;">💸 FinanceZen</h1>
-    <p style="color: #94a3b8; font-size: 1.2rem; margin-top: 0.5rem;">La Révolution Budgétaire Personnelle</p>
-  </div>
-</p>
+# FinanceZen - Gestionnaire de Finances Personnelles
 
-## À propos de FinanceZen
+FinanceZen est une application web (SaaS) complète dédiée à la gestion des finances personnelles. Conçue pour offrir une alternative moderne et intuitive aux feuilles de calcul complexes, elle permet aux utilisateurs de reprendre le contrôle de leur budget, de suivre leurs dettes et de planifier leurs objectifs d'épargne.
 
-**FinanceZen** est une application web moderne (SaaS) conçue pour aider les particuliers, entrepreneurs, et freelances à reprendre le contrôle de leurs finances personnelles. Fini les fichiers Excel complexes, FinanceZen propose une interface claire, des tableaux de bord interactifs et des outils de planification financière intuitifs pour bâtir sa prospérité financière jour après jour.
+L'application intègre un système d'abonnement complet géré via la passerelle de paiement FedaPay, avec des rappels automatiques et une gestion granulaire des profils utilisateurs.
 
-L'application intègre un système d'abonnement complet géré via **FedaPay** avec des rappels automatiques et une architecture multi-devises.
+---
 
-## ✨ Fonctionnalités Principales
+## Fonctionnalités Principales de l'Application
 
-*   📊 **Tableau de Bord Global :** Vue d'ensemble de la santé financière (Revenus, Dépenses, Dette restante, Épargne).
-*   💰 **Gestion des Budgets :** Définition de budgets par catégorie (Loyer, Courses, Loisirs) avec suivi et alertes en direct.
-*   💳 **Transactions Rapides :** Saisie ultra-rapide des flux avec catégorisation automatique.
-*   📉 **Éradication des Dettes :** Planification des remboursements (Crédits, prêts personnels) et suivi visuel de l'avancement.
-*   🎯 **Objectifs d'Épargne :** Fixation de cibles (Voyage, Voiture, Fonds d'urgence) avec barre de progression.
-*   📑 **Rapports Analytiques :** Graphiques visuels précis sur les habitudes de dépenses et exports (PDF/CSV).
-*   🛍️ **Système d'Abonnement SaaS :** Intégration FedaPay (Mobile Money & CB), avec formules mensuelles/annuelles, période d'essai de 7 jours et renouvellement automatique.
-*   📱 **Interface 100% Responsive :** Utilisable fluidement sur Mobile, Tablette et Desktop.
-*   🛡️ **Mode Administrateur :** Un panneau de contrôle exclusif pour gérer les utilisateurs, surveiller les revenus (MRR, Chiffre d'Affaires) et dépanner les abonnements.
+### 1. Tableau de Bord Financier
+- **Vue Macro-économique :** Affichage en temps réel du solde total, des revenus mensuels, des dépenses engagées, de la dette restante et des économies globales.
+- **Rapports Graphiques :** Visualisation intuitive de la répartition des dépenses et de l'évolution financière grâce à l'intégration de bibliothèques graphiques.
 
-## 🛠️ Stack Technique
+### 2. Gestion des Budgets
+- **Catégorisation :** Création et gestion de catégories budgétaires personnalisées ou prédéfinies (Logement, Alimentation, Transports, etc.).
+- **Limites Mensuelles :** Définition de plafonds de dépenses pour chaque catégorie.
+- **Suivi des Écarts :** Comparaison automatique entre le budget prévisionnel et les dépenses réelles saisies.
 
-*   **Backend :** [Laravel 11](https://laravel.com) (PHP 8.2+)
-*   **Base de Données :** PostgreSQL
-*   **Frontend :** Blade Templates, [Tailwind CSS 3](https://tailwindcss.com) & [Alpine.js](https://alpinejs.dev)
-*   **Paiements :** API FedaPay
-*   **Déploiement Continu :** GitHub Actions -> Transfert FTP sécurisé (o2switch)
+### 3. Saisie et Suivi des Transactions
+- Enregistrement rapide des flux financiers (revenus et dépenses).
+- Possibilité d'affecter une transaction à une catégorie budgétaire spécifique.
+- Gestion des devises avec support initial pour le XOF (Franc CFA).
 
-## 🚀 Installation & Lancement en Local
+### 4. Éradication des Dettes
+- Saisie des dettes (prêts bancaires, dettes personnelles, etc.) avec taux d'intérêt et date cible.
+- Enregistrement des paiements (mensualités) liés à chaque dette.
+- Jauge visuelle de la progression du remboursement.
+
+### 5. Objectifs d'Épargne
+- Définition de projets d'épargne (Fonds d'urgence, projet immobilier, vacances).
+- Ciblage d'un montant et d'une date d'échéance.
+- Suivi des contributions et visualisation du chemin restant à parcourir.
+
+### 6. Mode Administrateur
+- **Gestion des Utilisateurs :** Vue liste des inscrits, accès aux détails de leurs historiques d'abonnement, et possibilité d'ajuster leur rôle ou de désactiver leur compte.
+- **Gestion des Abonnements :** Supervision globale des revenus (Chiffre d'Affaires, Revenu Mensuel Récurrent - MRR).
+- **Validation Manuelle :** Possibilité de confirmer manuellement des paiements en attente et d'allonger la durée des abonnements exceptionnellement.
+
+### 7. Module d'Abonnement (FedaPay)
+- Période d'essai automatique de 7 jours offerte à l'inscription.
+- Plans tarifaires (Mensuel, Annuel).
+- Renouvellement, expiration et coupure d'accès automatisés (mécanisme de tâches en arrière-plan).
+
+---
+
+## Architecture et Stack Technique
+
+Le projet repose sur une architecture robuste séparant la logique métier et l'interface utilisateur.
+
+- **Framework Backend :** Laravel 11 (PHP 8.2+). Responsable de l'API web, du routage, de l'authentification (Laravel Breeze) et de la communication avec la base de données via l'ORM Eloquent.
+- **Base de Données :** PostgreSQL. Permet des analyses temporelles avancées et des extractions robustes de statistiques.
+- **Frontend :** 
+  - Moteur de template : Laravel Blade.
+  - Framework CSS : Tailwind CSS v3 pour un design moderne, épuré et 100% responsive.
+  - Javascript : Alpine.js pour l'interactivité légère des composants sans surcharger le navigateur.
+- **Passerelle de Paiement :** API FedaPay, avec système de webhook intégré pour écouter et valider les transactions entrantes côté serveur de manière asynchrone.
+
+---
+
+## Guide d'Installation pour le Développement Local
 
 ### Prérequis
-* PHP 8.2 ou supérieur
-* Composer
-* Node.js & NPM
-* PostgreSQL
+- PHP 8.2 ou version ultérieure
+- Composer (Gestionnaire de dépendances PHP)
+- Node.js & NPM (Pour la compilation des assets)
+- Un serveur PostgreSQL actif
 
-### Étapes d'installation
+### Procédure d'installation
 
-1. **Cloner le projet**
+1. **Récupération du code source**
 ```bash
 git clone https://github.com/Migyaba/financezen.git
 cd financezen
 ```
 
-2. **Installer les dépendances PHP et Node**
+2. **Installation des dépendances**
 ```bash
 composer install
 npm install
 ```
 
-3. **Configurer l'environnement**
+3. **Configuration de l'Environnement (.env)**
+Commencez par dupliquer le fichier d'exemple :
 ```bash
 cp .env.example .env
+```
+Générez ensuite la clé d'application Laravel de sécurité :
+```bash
 php artisan key:generate
 ```
-*Configurez ensuite votre fichier `.env` avec vos identifiants PostgreSQL locaux et vos clés API de test FedaPay (`FEDAPAY_SECRET_KEY`, `FEDAPAY_PUBLIC_KEY`, etc.).*
+Ouvrez votre fichier `.env` nouvellement créé et configurez absolument les rubriques suivantes :
+- `DB_CONNECTION=pgsql`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` : avec vos accès PostgreSQL locaux.
+- `FEDAPAY_SECRET_KEY`, `FEDAPAY_PUBLIC_KEY` : avec vos clés de test FedaPay (mode Sandbox).
 
-4. **Préparer la Base de données**
+4. **Préparation de la Base de Données**
+Lancez la création des tables et structure du projet :
 ```bash
-# Lancer les migrations pour créer les tables
 php artisan migrate
-
-# Lancer le seeder pour insérer des catégories de budget par défaut
+```
+Si vous souhaitez initialiser des catégories de budget par défaut (logement, santé, etc.) pour tester immédiatement l'outil :
+```bash
 php artisan db:seed
 ```
 
-5. **Compiler les ressources frontend (CSS/JS)**
+5. **Lancement du Serveur et Compilation**
+Ouvrez un terminal pour compiler le Javascript et le CSS en temps réel :
 ```bash
-# Pour le développement en temps réel
 npm run dev
-
-# Ou pour simuler la production
-npm run build
 ```
-
-6. **Lancer le serveur de développement Laravel**
+Dans un second terminal, démarrez le serveur PHP local :
 ```bash
 php artisan serve
 ```
-Le projet sera accessible sur `http://localhost:8000`.
 
-## ⚙️ Déploiement en Production (CI/CD o2switch)
-
-Ce projet est configuré pour se déployer **automatiquement** à chaque `push` sur la branche `main` via les Actions GitHub, vers un hébergement standard cPanel tel que o2switch.
-
-### Configuration des Secrets GitHub
-Pour que le déploiement fonctionne, vous devez déclarer 3 variables secrètes dans votre dépôt GitHub *(Settings > Secrets and variables > Actions)* :
-* `FTP_SERVER` (l'IP ou le nom de votre serveur d'hébergement o2switch)
-* `FTP_USERNAME` (votre identifiant cPanel)
-* `FTP_PASSWORD` (votre mot de passe cPanel)
-
-Dès qu'un code est validé sur `main`, GitHub se connecte en FTP, supprime les exceptions, compile le build Vite, et pousse les nouveautés dans `/financezen.miguelmissetcho.com/`.
-
-*(N'oubliez pas d'exécuter `php artisan migrate` manuellement dans le Terminal o2switch lors de la première installation).*
-
-## ⏱️ Tâches Planifiées (Cron Jobs)
-
-FinanceZen utilise le planificateur de tâches de Laravel pour gérer les expirations d'abonnement et l'envoi d'emails. Sur votre serveur de production, vous devez ajouter cette tâche CRON globale s'exécutant **chaque minute** (`* * * * *`) :
-
-```bash
-cd /chemin/vers/votre/dossier/financezen && php artisan schedule:run >> /dev/null 2>&1
-```
-
-**Tâches internes exécutées automatiquement par Laravel :**
-* `financezen:cleanup-trials-subs` : À minuit `00:05`, détecte et coupe tous les comptes dont l'abonnement ou la période d'essai est arrivée à terme.
-* `financezen:send-reminders` : À `08:15` tous les jours, envoie des emails d'alerte aux utilisateurs (J-3 fin d'essai, J-1 coupure imminente, J-5 renouvellement, etc.).
-
-## 👨‍💻 Créateur
-
-Développé par **Miguel M.** pour révolutionner l'approche de la budgétisation.
+L'application est maintenant active à l'adresse `http://localhost:8000`. Vous pouvez créer votre premier compte via la page d'inscription.
 
 ---
-*Ce projet est une solution complète, de l'inscription de l'utilisateur jusqu'au reversement transparent des abonnements dans la comptabilité de l'administrateur.*
+
+## Tâches Automatisées (Cron Jobs)
+
+FinanceZen utilise le planificateur de commandes Artisan de Laravel pour effectuer la supervision des abonnements en arrière-plan (coupures, envois d'emails de relance).
+
+Lors d'un déploiement ou en développement local, les tâches planifiées suivantes doivent être activées. 
+
+**Liste des commandes métiers (`routes/console.php`) :**
+- `php artisan financezen:cleanup-trials-subs` : À exécuter idéalement à minuit. Vérifie la table des abonnements et révoque les accès des comptes dont la limite de validité est échue.
+- `php artisan financezen:send-reminders` : À exécuter quotidiennement. Analyse les dates et génère des courriels vers les utilisateurs nécessitant un appel à l'action (fin de période d'essai imminente, compte échu).
+
+En production, ces commandes doivent être adossées au Cron system s'assurant de lancer `php artisan schedule:run` chaque minute.
