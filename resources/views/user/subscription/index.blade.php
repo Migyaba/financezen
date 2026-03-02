@@ -17,35 +17,62 @@
         @endif
 
         <!-- Current Status -->
-        @if($trialDaysLeft !== null)
-        <div class="bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/5 rounded-3xl p-8 border-2 border-primary/20 relative overflow-hidden">
+        @if($targetDate)
+        <div class="{{ $activeSubscription ? 'bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/5 border-emerald-200/50' : 'bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/5 border-primary/20' }} rounded-3xl p-8 border-2 relative overflow-hidden">
+            @if(!$activeSubscription)
             <div class="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-            <div class="relative text-center space-y-4">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold tracking-widest uppercase">🎉 Période d'essai gratuite</div>
-                <h2 class="text-3xl font-black text-slate-800 dark:text-white">
-                    Il vous reste <span class="text-primary">{{ $trialDaysLeft }} jour{{ $trialDaysLeft > 1 ? 's' : '' }}</span> d'essai
-                </h2>
-                <p class="text-slate-500 max-w-md mx-auto">Profitez de toutes les fonctionnalités premium pendant votre période d'essai gratuite.</p>
+            @endif
+            <div class="relative text-center space-y-6">
+                <div class="inline-flex items-center gap-2 px-4 py-2 {{ $activeSubscription ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-primary/10 text-primary' }} rounded-full text-xs font-bold tracking-widest uppercase shadow-sm">
+                    {{ $activeSubscription ? '✨ Abonnement Actif' : '🎉 Période d\'essai gratuite' }}
+                </div>
                 
+                <h2 class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white">
+                    Temps restant
+                </h2>
+
+                <!-- Countdown -->
+                <div x-data="countdownTimer('{{ $targetDate->toIso8601String() }}')" class="flex flex-wrap items-center justify-center gap-3 md:gap-5 mt-4 group">
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="days" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Jours</span>
+                    </div>
+                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="hours" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Heures</span>
+                    </div>
+                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="minutes" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Minutes</span>
+                    </div>
+                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="seconds" class="text-3xl md:text-5xl font-black text-slate-600 dark:text-slate-300">00</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">S</span>
+                    </div>
+                </div>
+
+                <p class="text-slate-500 max-w-lg mx-auto text-sm mt-4">
+                    {{ $activeSubscription ? 'Profitez de votre abonnement sans limite jusqu\'à son expiration.' : 'Profitez de toutes les fonctionnalités premium pendant votre période d\'essai gratuite.' }}
+                </p>
+                
+                @if(!$activeSubscription)
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 max-w-xl mx-auto">
                     <div class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><i data-lucide="check" class="text-primary w-4 h-4"></i> Budgets illimités</div>
                     <div class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><i data-lucide="check" class="text-primary w-4 h-4"></i> Suivi des dettes</div>
                     <div class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><i data-lucide="check" class="text-primary w-4 h-4"></i> Objectifs d'épargne</div>
                     <div class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><i data-lucide="check" class="text-primary w-4 h-4"></i> Rapports avancés</div>
                 </div>
+                @endif
             </div>
-        </div>
-        @elseif($activeSubscription)
-        <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/5 rounded-3xl p-8 border-2 border-emerald-200/50 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-bold tracking-widest uppercase mb-4">✅ Abonnement actif</div>
-            <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Votre abonnement est actif</h2>
-            <p class="text-slate-500">Expire le {{ $activeSubscription->ends_at->format('d/m/Y') }}</p>
         </div>
         @else
         <div class="bg-gradient-to-br from-red-500/10 to-red-500/5 dark:from-red-500/20 dark:to-red-500/5 rounded-3xl p-8 border-2 border-red-200/50 text-center">
             <div class="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 rounded-full text-xs font-bold tracking-widest uppercase mb-4">❌ Accès expiré</div>
             <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Votre accès a expiré</h2>
-            <p class="text-slate-500 mb-6">Renouvelez votre abonnement pour retrouver l'accès complet.</p>
+            <p class="text-slate-500 mb-6">Renouvelez votre abonnement pour retrouver l'accès complet aux fonctionnalités.</p>
         </div>
         @endif
 
@@ -55,7 +82,7 @@
                 <h3 class="text-xl font-bold text-slate-800 dark:text-white mt-2 mb-2">Mensuel</h3>
                 <p class="text-sm text-slate-500 mb-6">Flexibilité totale, sans engagement.</p>
                 <div class="flex items-baseline justify-center gap-1 mb-8">
-                    <span class="text-4xl font-black text-slate-800 dark:text-white">100</span>
+                    <span class="text-4xl font-black text-slate-800 dark:text-white">1 000</span>
                     <span class="text-slate-500 font-bold tracking-wider">FCFA/mois</span>
                 </div>
                 <form action="{{ route('subscription.checkout') }}" method="POST">
@@ -122,4 +149,42 @@
         </div>
         @endif
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('countdownTimer', (endDateString) => ({
+                target: new Date(endDateString).getTime(),
+                days: '00',
+                hours: '00',
+                minutes: '00',
+                seconds: '00',
+                init() {
+                    if (!endDateString) return;
+                    
+                    const updateCountdown = () => {
+                        const now = new Date().getTime();
+                        const distance = this.target - now;
+
+                        if (distance < 0) {
+                            this.days = '00';
+                            this.hours = '00';
+                            this.minutes = '00';
+                            this.seconds = '00';
+                            return;
+                        }
+
+                        this.days = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                        this.hours = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                        this.minutes = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                        this.seconds = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+                    };
+
+                    updateCountdown();
+                    setInterval(updateCountdown, 1000);
+                }
+            }));
+        });
+    </script>
+    @endpush
 </x-app-layout>

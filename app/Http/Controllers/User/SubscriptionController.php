@@ -18,14 +18,19 @@ class SubscriptionController extends Controller
             ->latest()
             ->first();
 
-        $trialDaysLeft = null;
-        if ($user->trial_ends_at && $user->trial_ends_at->isFuture()) {
-            $trialDaysLeft = now()->diffInDays($user->trial_ends_at);
+        $targetDate = null;
+        $isTrial = false;
+
+        if ($activeSubscription) {
+            $targetDate = $activeSubscription->ends_at;
+        } elseif ($user->trial_ends_at && $user->trial_ends_at->isFuture()) {
+            $targetDate = $user->trial_ends_at;
+            $isTrial = true;
         }
 
         $payments = $user->payments()->with('subscription')->latest()->get();
 
-        return view('user.subscription.index', compact('activeSubscription', 'trialDaysLeft', 'payments'));
+        return view('user.subscription.index', compact('activeSubscription', 'targetDate', 'isTrial', 'payments'));
     }
 
     public function checkout(Request $request)
@@ -35,12 +40,11 @@ class SubscriptionController extends Controller
         $plan = $request->input('plan', 'monthly');
         $currency = config('fedapay.currency', 'XOF');
 
-        // Define plan prices and durations
         if ($plan === 'yearly') {
             $amount = 10000;
             $durationDays = 365;
         } else {
-            $amount = 100;
+            $amount = 1000;
             $durationDays = 30;
         }
 
