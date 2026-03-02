@@ -29,16 +29,16 @@
             <!-- Progress Chart (2/3 width) -->
             <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-8">
                 <h3 class="font-bold text-slate-800 dark:text-white mb-6">Évolution de l'épargne</h3>
-                <div class="h-64" x-data="savingsChartComponent()">
+                <div class="h-64">
                     <canvas id="savingsChart"></canvas>
                 </div>
             </div>
 
             <!-- Simulation Card (1/3 width) -->
             <div class="bg-gradient-to-br from-primary to-indigo-600 rounded-2xl shadow-sm p-8 text-white flex flex-col justify-center" x-data="{
-                monthlyContribution: {{ $saving->current_amount > 0 && $saving->contributions->count() > 0 ? round($saving->current_amount / $saving->contributions->count()) : 50000 }},
+                monthlyContribution: {{ (float)($saving->current_amount > 0 && $saving->contributions->count() > 0 ? round($saving->current_amount / $saving->contributions->count()) : 50000) }},
                 get monthsLeft() {
-                    const remaining = {{ $saving->target_amount }} - {{ $saving->current_amount }};
+                    const remaining = {{ (float)$saving->target_amount }} - {{ (float)$saving->current_amount }};
                     if (remaining <= 0) return 0;
                     if (this.monthlyContribution <= 0) return '∞';
                     return Math.ceil(remaining / this.monthlyContribution);
@@ -94,69 +94,65 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('savingsChartComponent', () => ({
-                init() {
-                    const ctx = document.getElementById('savingsChart');
-                    const chartData = @json($chartData);
-                    
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: chartData.map(d => d.date),
-                            datasets: [{
-                                label: 'Montant épargné (FCFA)',
-                                data: chartData.map(d => d.amount),
-                                borderColor: '#10B981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: '#10B981',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2,
-                                pointRadius: 4,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    backgroundColor: '#1E293B',
-                                    padding: 12,
-                                    titleFont: { size: 13, family: "'Inter', sans-serif" },
-                                    bodyFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
-                                    displayColors: false,
-                                    callbacks: {
-                                        label: function(context) {
-                                            return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
-                                        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('savingsChart');
+            const chartData = @json($chartData);
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94A3B8' : '#64748B';
+            
+            if (ctx && chartData && chartData.length > 0) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.map(d => d.date),
+                        datasets: [{
+                            label: 'Montant épargné (FCFA)',
+                            data: chartData.map(d => d.amount),
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#10B981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1E293B',
+                                padding: 12,
+                                callbacks: {
+                                    label: function(context) {
+                                        return new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
                                     }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                                    ticks: {
-                                        color: '#94A3B8',
-                                        font: { family: "'Inter', sans-serif" },
-                                        callback: function(value) { return new Intl.NumberFormat('fr-FR').format(value); }
-                                    }
-                                },
-                                x: {
-                                    grid: { display: false },
-                                    ticks: { color: '#94A3B8', font: { family: "'Inter', sans-serif" } }
                                 }
                             }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(226, 232, 240, 0.8)' },
+                                ticks: {
+                                    color: textColor,
+                                    font: { family: "'Inter', sans-serif" },
+                                    callback: function(value) { return new Intl.NumberFormat('fr-FR').format(value); }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: textColor, font: { family: "'Inter', sans-serif" } }
+                            }
                         }
-                    });
-                }
-            }));
+                    }
+                });
+            }
         });
     </script>
     @endpush

@@ -24,6 +24,21 @@ Route::view('/mentions-legales', 'pages.legal')->name('legal');
 Route::view('/confidentialite', 'pages.privacy')->name('privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Debug route - temporary
+    Route::get('/debug', function() {
+        $user = auth()->user();
+        $txCount = $user->transactions()->count();
+        $catCount = $user->budgetCategories()->count();
+        return response()->json([
+            'authenticated' => true,
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'transactions_count' => $txCount,
+            'categories_count' => $catCount,
+            'recent_transactions' => $user->transactions()->latest()->limit(3)->get(['id', 'type', 'amount', 'transaction_date']),
+        ]);
+    })->name('debug');
+
     // Shared routes (no subscription check)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

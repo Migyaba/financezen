@@ -55,6 +55,9 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
+        // Debug: Log qui está enregistrant une transaction
+        \Log::info('Storing transaction for user: ' . auth()->id());
+
         $validated = $request->validate([
             'category_id' => 'required', // Can be 'new' or an ID
             'new_category_name' => 'required_if:category_id,new|nullable|string|max:255',
@@ -70,9 +73,13 @@ class TransactionController extends Controller
 
         // Handle dynamic category creation
         if ($validated['category_id'] === 'new') {
+            // Budget categories can only be 'income' or 'expense'
+            // Map transaction types to budget category types
+            $categoryType = $validated['type'] === 'income' ? 'income' : 'expense';
+            
             $newCat = auth()->user()->budgetCategories()->create([
                 'name' => $validated['new_category_name'],
-                'type' => $validated['type'] === 'income' ? 'income' : 'expense',
+                'type' => $categoryType,
                 'color' => '#' . substr(md5(rand()), 0, 6)
             ]);
             $validated['category_id'] = $newCat->id;
@@ -82,7 +89,9 @@ class TransactionController extends Controller
         
         $validated['is_recurring'] = $request->has('is_recurring');
 
-        auth()->user()->transactions()->create($validated);
+        $transaction = auth()->user()->transactions()->create($validated);
+        
+        \Log::info('Transaction created: ID = ' . $transaction->id . ', User = ' . $transaction->user_id);
 
         return back()->with('success', 'Transaction enregistrée avec succès.');
     }

@@ -23,6 +23,9 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
+     * 
+     * Note: Auto-creation of Debt and SavingsGoal records is handled by UserObserver
+     * when dette_initiale or objectif_fonds_urgence are updated.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {

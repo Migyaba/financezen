@@ -19,6 +19,46 @@ class BudgetController extends Controller
             ->where('year', $year)
             ->first();
 
+        // AUTO-FILL: Créer ou mettre à jour les dépenses fixes pré-remplies depuis le profil
+        if (!$budget) {
+            $budget = auth()->user()->budgets()->create([
+                'month' => $month, 'year' => $year,
+                'salary_planned' => auth()->user()->monthly_salary,
+                'salary_actual' => 0, 'freelance_planned' => 0, 'freelance_actual' => 0,
+            ]);
+        }
+
+        // On s'assure que le salaire prévu est synchronisé si toujours à 0
+        if ($budget->salary_planned == 0 && auth()->user()->monthly_salary > 0) {
+            $budget->update(['salary_planned' => auth()->user()->monthly_salary]);
+        }
+
+        $fixedExpenses = [
+            'Loyer' => auth()->user()->loyer,
+            'Eau + Électricité' => auth()->user()->eau_electricite,
+            'Internet' => auth()->user()->internet,
+            'Nourriture' => auth()->user()->nourriture,
+            'Essence' => auth()->user()->essence,
+        ];
+
+        foreach ($fixedExpenses as $categoryName => $amount) {
+            if ($amount > 0) {
+                $category = BudgetCategory::where('name', $categoryName)
+                    ->where(function($q) { $q->where('user_id', auth()->id())->orWhere('is_default', true); })
+                    ->first();
+                
+                if ($category) {
+                    $item = $budget->items()->where('category_id', $category->id)->first();
+                    if (!$item || $item->amount_planned == 0) {
+                        $budget->items()->updateOrCreate(
+                            ['category_id' => $category->id],
+                            ['amount_planned' => $amount]
+                        );
+                    }
+                }
+            }
+        }
+
         $categories = BudgetCategory::where('user_id', auth()->id())
             ->orWhere('is_default', true)
             ->orderBy('type')

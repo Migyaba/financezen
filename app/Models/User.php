@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Observers\UserObserver;
+use App\Observers\UserCreatedObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,6 +28,13 @@ class User extends Authenticatable
         'currency',
         'monthly_salary',
         'freelance_split',
+        'loyer',
+        'eau_electricite',
+        'internet',
+        'nourriture',
+        'essence',
+        'dette_initiale',
+        'objectif_fonds_urgence',
         'trial_ends_at',
         'is_active',
         'role',
@@ -43,6 +52,16 @@ class User extends Authenticatable
     ];
 
     /**
+     * Bootstrap the model and register observers.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::observe(UserObserver::class);
+        static::observe(UserCreatedObserver::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -55,6 +74,13 @@ class User extends Authenticatable
             'trial_ends_at' => 'datetime',
             'is_active' => 'boolean',
             'monthly_salary' => 'decimal:2',
+            'loyer' => 'decimal:2',
+            'eau_electricite' => 'decimal:2',
+            'internet' => 'decimal:2',
+            'nourriture' => 'decimal:2',
+            'essence' => 'decimal:2',
+            'dette_initiale' => 'decimal:2',
+            'objectif_fonds_urgence' => 'decimal:2',
         ];
     }
 
@@ -78,6 +104,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function budgetCategories()
+    {
+        return $this->hasMany(BudgetCategory::class);
+    }
+
     public function debts()
     {
         return $this->hasMany(Debt::class);
@@ -93,3 +124,4 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 }
+
