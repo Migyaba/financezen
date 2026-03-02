@@ -40,7 +40,7 @@ class SubscriptionController extends Controller
             $amount = 10000;
             $durationDays = 365;
         } else {
-            $amount = 1000;
+            $amount = 100;
             $durationDays = 30;
         }
 

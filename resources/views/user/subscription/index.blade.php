@@ -55,7 +55,7 @@
                 <h3 class="text-xl font-bold text-slate-800 dark:text-white mt-2 mb-2">Mensuel</h3>
                 <p class="text-sm text-slate-500 mb-6">Flexibilité totale, sans engagement.</p>
                 <div class="flex items-baseline justify-center gap-1 mb-8">
-                    <span class="text-4xl font-black text-slate-800 dark:text-white">1 000</span>
+                    <span class="text-4xl font-black text-slate-800 dark:text-white">100</span>
                     <span class="text-slate-500 font-bold tracking-wider">FCFA/mois</span>
                 </div>
                 <form action="{{ route('subscription.checkout') }}" method="POST">

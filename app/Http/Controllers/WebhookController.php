@@ -56,10 +56,12 @@ class WebhookController extends Controller
         $subscription = Subscription::where('payment_reference', $transactionId)->first();
         if (!$subscription || $subscription->status === 'active') return;
 
+        $durationDays = $subscription->plan === 'yearly' ? 365 : 30;
+
         $subscription->update([
             'status' => 'active',
             'starts_at' => now(),
-            'ends_at' => now()->addDays(30),
+            'ends_at' => now()->addDays($durationDays),
         ]);
 
         Payment::updateOrCreate(
