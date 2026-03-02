@@ -1,6 +1,8 @@
 <x-app-layout>
     <x-slot name="header">Tableau de Bord</x-slot>
 
+    <x-onboarding-guide :userName="auth()->user()->name" />
+
     <div class="space-y-8">
         <!-- Subscription Alert -->
         <x-subscription-banner :daysLeft="$trialDaysLeft" :expired="$subscriptionExpired" />
