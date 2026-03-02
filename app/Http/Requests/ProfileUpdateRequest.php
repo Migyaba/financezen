@@ -29,6 +29,13 @@ class ProfileUpdateRequest extends FormRequest
             'currency' => ['required', 'string', 'max:10'],
             'monthly_salary' => ['nullable', 'numeric', 'min:0'],
             'freelance_split' => ['nullable', 'string', 'regex:/^\d+\/\d+\/\d+$/'], // e.g. 50/30/20
+            'loyer' => ['nullable', 'numeric', 'min:0'],
+            'eau_electricite' => ['nullable', 'numeric', 'min:0'],
+            'internet' => ['nullable', 'numeric', 'min:0'],
+            'nourriture' => ['nullable', 'numeric', 'min:0'],
+            'essence' => ['nullable', 'numeric', 'min:0'],
+            'dette_initiale' => ['nullable', 'numeric', 'min:0'],
+            'objectif_fonds_urgence' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

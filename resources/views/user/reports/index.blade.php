@@ -99,7 +99,7 @@
                         <p class="font-medium text-sm">Aucune donnée pour cette période</p>
                     </div>
                 @else
-                    <div class="h-64 relative" x-data="pieChartComponent()">
+                    <div class="h-64 relative">
                         <canvas id="pieChart"></canvas>
                     </div>
                 @endif
@@ -112,16 +112,16 @@
                     @forelse($topCategories as $tc)
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm" style="background-color: {{ $tc->category->color ?? '#94a3b8' }}">
-                                    <i data-lucide="{{ $tc->category->icon ?? 'tag' }}" class="w-4 h-4"></i>
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm" style="background-color: {{ $tc['color'] }}">
+                                    <i data-lucide="{{ $tc['icon'] }}" class="w-4 h-4"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold text-slate-800 dark:text-white">{{ $tc->category->name ?? 'N/A' }}</p>
-                                    @php $percent = $currentExpense > 0 ? round(($tc->total / $currentExpense) * 100) : 0; @endphp
+                                    <p class="text-sm font-bold text-slate-800 dark:text-white">{{ $tc['name'] }}</p>
+                                    @php $percent = $currentExpense > 0 ? round(($tc['total'] / $currentExpense) * 100) : 0; @endphp
                                     <p class="text-xs text-slate-400 font-medium">{{ $percent }}% du total</p>
                                 </div>
                             </div>
-                            <span class="text-sm font-black text-danger">{{ number_format($tc->total, 0, ',', ' ') }} FCFA</span>
+                            <span class="text-sm font-black text-danger">{{ number_format($tc['total'], 0, ',', ' ') }} FCFA</span>
                         </div>
                     @empty
                         <div class="text-center py-8">
@@ -148,102 +148,114 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('alpine:init', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#94A3B8' : '#64748B';
             const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(226,232,240,0.8)';
 
-            // Pie Chart Component
-            Alpine.data('pieChartComponent', () => ({
-                init() {
-                    const ctx = document.getElementById('pieChart');
-                    const pieData = @json($pieChartData);
-                    
-                    if (!pieData || pieData.length === 0) return;
+            console.log('Reports Charts Init...');
 
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: pieData.map(d => d.label),
-                            datasets: [{
-                                data: pieData.map(d => d.value),
-                                backgroundColor: pieData.map(d => d.color),
-                                borderWidth: 0,
-                                hoverOffset: 4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '70%',
-                            plugins: {
-                                legend: { position: 'right', labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' }, padding: 20 } },
-                                tooltip: {
-                                    backgroundColor: '#1E293B',
-                                    padding: 12,
-                                    titleFont: { size: 13, family: "'Inter', sans-serif" },
-                                    bodyFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
-                                    displayColors: true,
-                                    callbacks: { label: function(context) { return context.label + ': ' + new Intl.NumberFormat('fr-FR').format(context.raw) + ' FCFA'; } }
+            // Pie Chart
+            const pieData = @json($pieChartData);
+            const pieCtx = document.getElementById('pieChart');
+            
+            if (pieCtx && pieData && pieData.length > 0) {
+                new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pieData.map(d => d.label),
+                        datasets: [{
+                            data: pieData.map(d => d.value),
+                            backgroundColor: pieData.map(d => d.color),
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { 
+                                position: 'right', 
+                                labels: { 
+                                    color: textColor, 
+                                    font: { family: "'Inter', sans-serif", weight: 'bold', size: 11 },
+                                    padding: 15
+                                } 
+                            },
+                            tooltip: {
+                                backgroundColor: '#1E293B',
+                                padding: 12,
+                                callbacks: { 
+                                    label: function(context) { 
+                                        return context.label + ': ' + new Intl.NumberFormat('fr-FR').format(context.raw) + ' FCFA'; 
+                                    } 
                                 }
                             }
                         }
-                    });
-                }
-            }));
+                    }
+                });
+            }
 
             // Monthly Trends Line Chart
-            @if($months->isNotEmpty())
             const lineCtx = document.getElementById('reportsChart');
-            new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: {!! json_encode($months->pluck('label')) !!},
-                    datasets: [
-                        {
-                            label: 'Revenus',
-                            data: {!! json_encode($months->pluck('income')) !!},
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16,185,129,0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#10B981'
-                        },
-                        {
-                            label: 'Dépenses',
-                            data: {!! json_encode($months->pluck('expense')) !!},
-                            borderColor: '#EF4444',
-                            backgroundColor: 'rgba(239,68,68,0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#EF4444'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels:{color: textColor, font: {family: "'Inter', sans-serif", weight: 'bold'}} } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: textColor, font: {family: "'Inter', sans-serif", weight: 'bold'} } },
-                        y: { 
-                            grid: { color: gridColor }, 
-                            ticks: { 
-                                color: textColor, 
-                                font: {family: "'Inter', sans-serif", weight: 'bold'},
-                                callback: function(value) { return new Intl.NumberFormat('fr-FR').format(value); }
+            const monthsData = @json($months);
+            
+            if (lineCtx && monthsData && monthsData.length > 0) {
+                new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthsData.map(m => m.label),
+                        datasets: [
+                            {
+                                label: 'Revenus',
+                                data: monthsData.map(m => m.income),
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16,185,129,0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#10B981'
+                            },
+                            {
+                                label: 'Dépenses',
+                                data: monthsData.map(m => m.expense),
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239,68,68,0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#EF4444'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } 
                             } 
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textColor, font: { family: "'Inter', sans-serif" } } },
+                            y: { 
+                                grid: { color: gridColor }, 
+                                ticks: { 
+                                    color: textColor, 
+                                    font: { family: "'Inter', sans-serif" },
+                                    callback: function(value) { return new Intl.NumberFormat('fr-FR').format(value); }
+                                } 
+                            }
                         }
                     }
-                }
-            });
-            @endif
+                });
+            }
         });
     </script>
     @endpush

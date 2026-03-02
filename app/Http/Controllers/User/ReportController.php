@@ -17,79 +17,97 @@ class ReportController extends Controller
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date'))->startOfDay() : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfMonth();
 
-        // 1. Monthly Summary Line Chart Data
-        $months = collect();
-        if ($period !== 'custom') {
-            for ($i = $period - 1; $i >= 0; $i--) {
-                $date = now()->subMonths($i);
-                $income = $user->transactions()
-                    ->whereMonth('transaction_date', $date->month)
-                    ->whereYear('transaction_date', $date->year)
-                    ->where('type', 'income')
-                    ->sum('amount');
-                $expense = $user->transactions()
-                    ->whereMonth('transaction_date', $date->month)
-                    ->whereYear('transaction_date', $date->year)
-                    ->where('type', 'expense')
-                    ->sum('amount');
+        // Fetch all relevant transactions for the chart (last 6 months)
+        $monthsChartData = $user->transactions()
+            ->where('transaction_date', '>=', now()->subMonths(5)->startOfMonth())
+            ->get();
 
-                $months->push([
-                    'label' => $date->translatedFormat('M Y'),
-                    'income' => $income,
-                    'expense' => $expense,
-                    'balance' => $income - $expense,
-                ]);
-            }
+        $months = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $currentDate = now()->subMonths($i);
+            $mCode = $currentDate->format('Y-m');
+            
+            $periodTx = $monthsChartData->filter(fn($t) => $t->transaction_date->format('Y-m') === $mCode);
+            
+            $inc = $periodTx->where('type', 'income')->sum('amount');
+            $exp = $periodTx->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
+
+            $months->push([
+                'label' => $currentDate->translatedFormat('M Y'),
+                'income' => (float)$inc,
+                'expense' => (float)$exp,
+                'balance' => (float)($inc - $exp),
+            ]);
         }
 
-        // 2. Data for the selected period (or current month)
-        $currentIncome = $user->transactions()->whereBetween('transaction_date', [$startDate, $endDate])->where('type', 'income')->sum('amount');
-        $currentExpense = $user->transactions()->whereBetween('transaction_date', [$startDate, $endDate])->where('type', 'expense')->sum('amount');
+        // Transactions for the selected period
+        $periodTransactions = $user->transactions()
+            ->with('category')
+            ->whereBetween('transaction_date', [$startDate, $endDate])
+            ->get();
 
-        // 3. Comparison with Previous Period (Same duration)
+        $currentIncome = $periodTransactions->where('type', 'income')->sum('amount');
+        $currentExpense = $periodTransactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
+
+        // Comparison with Previous Period
         $durationInDays = $startDate->diffInDays($endDate) + 1;
         $prevStartDate = $startDate->copy()->subDays($durationInDays);
         $prevEndDate = $endDate->copy()->subDays($durationInDays);
 
-        $prevIncome = $user->transactions()->whereBetween('transaction_date', [$prevStartDate, $prevEndDate])->where('type', 'income')->sum('amount');
-        $prevExpense = $user->transactions()->whereBetween('transaction_date', [$prevStartDate, $prevEndDate])->where('type', 'expense')->sum('amount');
+        $prevTransactions = $user->transactions()
+            ->whereBetween('transaction_date', [$prevStartDate, $prevEndDate])
+            ->get();
+
+        $prevIncome = $prevTransactions->where('type', 'income')->sum('amount');
+        $prevExpense = $prevTransactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
 
         $incomeChange = $prevIncome > 0 ? round((($currentIncome - $prevIncome) / $prevIncome) * 100) : ($currentIncome > 0 ? 100 : 0);
         $expenseChange = $prevExpense > 0 ? round((($currentExpense - $prevExpense) / $prevExpense) * 100) : ($currentExpense > 0 ? 100 : 0);
 
-        // 4. Pie Chart & Top Categories (based on selected period)
-        $categoriesData = $user->transactions()
-            ->with('category')
-            ->whereBetween('transaction_date', [$startDate, $endDate])
-            ->where('type', 'expense')
-            ->selectRaw('category_id, SUM(amount) as total')
-            ->groupBy('category_id')
-            ->orderByDesc('total')
-            ->get();
+        // Pie Chart & Top Categories (based on period transactions)
+        $expenseGroups = $periodTransactions->whereIn('type', ['expense', 'debt_payment', 'savings'])
+            ->groupBy(function($t) {
+                return ($t->category_id ?? 'null') . '_' . $t->type;
+            });
 
-        $topCategories = $categoriesData->take(5);
+        $categoriesData = collect();
+        foreach ($expenseGroups as $key => $groupTx) {
+            $first = $groupTx->first();
+            $categoriesData->push([
+                'name' => $first->category->name ?? ($first->type === 'debt_payment' ? 'Dettes' : ($first->type === 'savings' ? 'Épargne' : 'Autre')),
+                'color' => $first->category->color ?? ($first->type === 'debt_payment' ? '#F43F5E' : ($first->type === 'savings' ? '#10B981' : '#64748b')),
+                'icon' => $first->category->icon ?? ($first->type === 'debt_payment' ? 'credit-card' : ($first->type === 'savings' ? 'piggy-bank' : 'tag')),
+                'type' => $first->type,
+                'total' => (float)$groupTx->sum('amount')
+            ]);
+        }
+
+        $topCategories = $categoriesData->sortByDesc('total')->take(5);
+        
         $pieChartData = $categoriesData->map(fn($item) => [
-            'label' => $item->category->name ?? 'Non catégorisé',
-            'value' => $item->total,
-            'color' => $item->category->color ?? '#94A3B8'
+            'label' => $item['name'],
+            'value' => $item['total'],
+            'color' => $item['color']
         ]);
 
-        // 5. Debt & Savings Progress
+        $debtProgress = 0;
+        $savingsProgress = 0;
         $debtsTotal = collect(['initial' => 0, 'current' => 0]);
         $savingsTotal = collect(['target' => 0, 'current' => 0]);
 
-        if ($user->debts) {
-            $debtsTotal['initial'] = $user->debts->sum('initial_amount');
-            $debtsTotal['current'] = $user->debts->sum('current_amount');
+        $activeDebts = $user->debts;
+        if ($activeDebts->isNotEmpty()) {
+            $debtsTotal['initial'] = (float)$activeDebts->sum('initial_amount');
+            $debtsTotal['current'] = (float)$activeDebts->sum('current_amount');
+            $debtProgress = $debtsTotal['initial'] > 0 ? round((($debtsTotal['initial'] - $debtsTotal['current']) / $debtsTotal['initial']) * 100) : 0;
         }
         
-        if ($user->savingsGoals) {
-            $savingsTotal['target'] = $user->savingsGoals->sum('target_amount');
-            $savingsTotal['current'] = $user->savingsGoals->sum('current_amount');
+        $activeSavings = $user->savingsGoals;
+        if ($activeSavings->isNotEmpty()) {
+            $savingsTotal['target'] = (float)$activeSavings->sum('target_amount');
+            $savingsTotal['current'] = (float)$activeSavings->sum('current_amount');
+            $savingsProgress = $savingsTotal['target'] > 0 ? round(($savingsTotal['current'] / $savingsTotal['target']) * 100) : 0;
         }
-
-        $debtProgress = $debtsTotal['initial'] > 0 ? round((($debtsTotal['initial'] - $debtsTotal['current']) / $debtsTotal['initial']) * 100) : 0;
-        $savingsProgress = $savingsTotal['target'] > 0 ? round(($savingsTotal['current'] / $savingsTotal['target']) * 100) : 0;
 
         return view('user.reports.index', compact(
             'months', 'topCategories', 'period', 'startDate', 'endDate',

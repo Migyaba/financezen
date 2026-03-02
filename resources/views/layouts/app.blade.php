@@ -139,5 +139,6 @@
             // Re-render icons after Alpine updates
             document.addEventListener('alpine:initialized', () => lucide.createIcons());
         </script>
+        @stack('scripts')
     </body>
 </html>

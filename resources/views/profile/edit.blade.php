@@ -92,6 +92,99 @@
                     </div>
                 </div>
 
+                <!-- Section Dépenses Fixes -->
+                <div class="border-t border-slate-100 dark:border-slate-700 pt-6 mt-6">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i data-lucide="home" class="w-4 h-4"></i> Paramètres Dépenses Fixes (fixé une seule fois)
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Loyer -->
+                        <div>
+                            <label for="loyer" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="home" class="w-3 h-3 inline"></i> Loyer Mensuel
+                            </label>
+                            <input id="loyer" name="loyer" type="number" step="0.01" value="{{ old('loyer', $user->loyer ?? 0) }}"
+                                   placeholder="Ex: 27000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <x-input-error class="mt-2" :messages="$errors->get('loyer')" />
+                        </div>
+
+                        <!-- Eau & Électricité -->
+                        <div>
+                            <label for="eau_electricite" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="zap" class="w-3 h-3 inline"></i> Eau + Électricité
+                            </label>
+                            <input id="eau_electricite" name="eau_electricite" type="number" step="0.01" value="{{ old('eau_electricite', $user->eau_electricite ?? 0) }}"
+                                   placeholder="Ex: 10000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <x-input-error class="mt-2" :messages="$errors->get('eau_electricite')" />
+                        </div>
+
+                        <!-- Internet -->
+                        <div>
+                            <label for="internet" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="globe" class="w-3 h-3 inline"></i> Internet
+                            </label>
+                            <input id="internet" name="internet" type="number" step="0.01" value="{{ old('internet', $user->internet ?? 0) }}"
+                                   placeholder="Ex: 15500" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <x-input-error class="mt-2" :messages="$errors->get('internet')" />
+                        </div>
+
+                        <!-- Nourriture -->
+                        <div>
+                            <label for="nourriture" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="shopping-cart" class="w-3 h-3 inline"></i> Nourriture
+                            </label>
+                            <input id="nourriture" name="nourriture" type="number" step="0.01" value="{{ old('nourriture', $user->nourriture ?? 0) }}"
+                                   placeholder="Ex: 50000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <x-input-error class="mt-2" :messages="$errors->get('nourriture')" />
+                        </div>
+
+                        <!-- Essence -->
+                        <div>
+                            <label for="essence" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="fuel" class="w-3 h-3 inline"></i> Essence/Transport
+                            </label>
+                            <input id="essence" name="essence" type="number" step="0.01" value="{{ old('essence', $user->essence ?? 0) }}"
+                                   placeholder="Ex: 12000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <x-input-error class="mt-2" :messages="$errors->get('essence')" />
+                        </div>
+
+                        <!-- Espace vide pour balance les colonnes -->
+                        <div></div>
+                    </div>
+                </div>
+
+                <!-- Section Objectifs Financiers -->
+                <div class="border-t border-slate-100 dark:border-slate-700 pt-6 mt-6">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4"></i> Objectifs Financiers
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Dette initiale -->
+                        <div>
+                            <label for="dette_initiale" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="alert-circle" class="w-3 h-3 inline"></i> Dette Initiale
+                            </label>
+                            <input id="dette_initiale" name="dette_initiale" type="number" step="0.01" value="{{ old('dette_initiale', $user->dette_initiale ?? 0) }}"
+                                   placeholder="Ex: 160000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">Montant total que vous devez</p>
+                            <x-input-error class="mt-2" :messages="$errors->get('dette_initiale')" />
+                        </div>
+
+                        <!-- Objectif fonds urgence -->
+                        <div>
+                            <label for="objectif_fonds_urgence" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                <i data-lucide="shield" class="w-3 h-3 inline"></i> Objectif Fonds d'Urgence
+                            </label>
+                            <input id="objectif_fonds_urgence" name="objectif_fonds_urgence" type="number" step="0.01" value="{{ old('objectif_fonds_urgence', $user->objectif_fonds_urgence ?? 500000) }}"
+                                   placeholder="Ex: 500000" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary">
+                            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">Montant de sécurité à atteindre</p>
+                            <x-input-error class="mt-2" :messages="$errors->get('objectif_fonds_urgence')" />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-end gap-4 pt-2">
                     @if (session('status') === 'profile-updated')
                         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)" class="text-sm text-success font-bold">✅ Sauvegardé !</p>

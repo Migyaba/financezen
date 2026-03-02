@@ -46,8 +46,9 @@ class DebtController extends Controller
         $debt->load(['payments' => fn($q) => $q->orderBy('payment_date')]);
 
         // Calculate cumulative debt amount over time for chart
+        $startDate = $debt->created_at ?? now();
         $chartData = collect([
-            ['date' => $debt->created_at->format('d/m/Y'), 'amount' => $debt->initial_amount]
+            ['date' => $startDate->format('d/m/Y'), 'amount' => (float)$debt->initial_amount]
         ]);
 
         $current = $debt->initial_amount;

@@ -40,16 +40,17 @@ class SavingsController extends Controller
         return back()->with('success', 'Objectif d\'épargne créé avec succès.');
     }
 
-    public function show(SavingsGoal $savingsGoal)
+    public function show(SavingsGoal $saving)
     {
-        $savingsGoal->load(['contributions' => fn($q) => $q->orderBy('contribution_date')]);
+        $saving->load(['contributions' => fn($q) => $q->orderBy('contribution_date')]);
 
+        $startDate = $saving->created_at ?? now();
         $chartData = collect([
-            ['date' => $savingsGoal->created_at->format('d/m/Y'), 'amount' => 0]
+            ['date' => $startDate->format('d/m/Y'), 'amount' => 0]
         ]);
 
         $current = 0;
-        foreach ($savingsGoal->contributions as $contribution) {
+        foreach ($saving->contributions as $contribution) {
             $current += $contribution->amount;
             $chartData->push([
                 'date' => $contribution->contribution_date->format('d/m/Y'),
@@ -57,28 +58,29 @@ class SavingsController extends Controller
             ]);
         }
 
-        return view('user.savings.show', compact('savingsGoal', 'chartData'));
+        return view('user.savings.show', compact('saving', 'chartData'));
     }
 
     public function addContribution(Request $request, SavingsGoal $savingsGoal)
     {
+        $saving = $savingsGoal;
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
             'contribution_date' => 'required|date',
             'notes' => 'nullable|string',
         ]);
 
-        $validated['savings_goal_id'] = $savingsGoal->id;
+        $validated['savings_goal_id'] = $saving->id;
         $validated['user_id'] = auth()->id();
 
         SavingsContribution::create($validated);
 
         // Update current amount
-        $savingsGoal->current_amount += $validated['amount'];
-        if ($savingsGoal->current_amount >= $savingsGoal->target_amount) {
-            $savingsGoal->status = 'achieved';
+        $saving->current_amount += $validated['amount'];
+        if ($saving->current_amount >= $saving->target_amount) {
+            $saving->status = 'achieved';
         }
-        $savingsGoal->save();
+        $saving->save();
 
         return back()->with('success', 'Contribution enregistrée.');
     }
