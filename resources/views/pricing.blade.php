@@ -96,7 +96,7 @@
                         </div>
 
                         <a href="{{ route('register') }}" class="block w-full text-center px-8 py-4 bg-primary text-white font-black text-lg rounded-2xl shadow-xl shadow-primary/30 hover:bg-primary-dark transition hover:-translate-y-1">Démarrer maintenant</a>
-                        <p class="text-center text-xs font-bold text-slate-400 mt-4">Paiement sécurisé via CinetPay</p>
+                        <p class="text-center text-xs font-bold text-slate-400 mt-4">Paiement sécurisé via FedaPay</p>
                     </div>
                 </div>
             </div>
