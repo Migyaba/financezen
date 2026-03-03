@@ -70,26 +70,50 @@
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
                 <h3 class="font-bold text-slate-800 dark:text-white">Historique des contributions</h3>
             </div>
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Notes</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-                    @forelse($saving->contributions as $c)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
-                        <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $c->contribution_date->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-sm font-black text-success">+{{ number_format($c->amount, 0, ',', ' ') }} FCFA</td>
-                        <td class="px-6 py-4 text-sm text-slate-500">{{ $c->notes ?? '-' }}</td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="3" class="px-6 py-12 text-center text-slate-500 text-sm">Aucune contribution enregistrée.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+            
+            <!-- Desktop View -->
+            <div class="hidden md:block">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        @forelse($saving->contributions as $c)
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
+                            <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $c->contribution_date->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 text-sm font-black text-success">+{{ number_format($c->amount, 0, ',', ' ') }} FCFA</td>
+                            <td class="px-6 py-4 text-sm text-slate-500">{{ $c->notes ?? '-' }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="px-6 py-12 text-center text-slate-500 text-sm">Aucune contribution enregistrée.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-700">
+                @forelse($saving->contributions as $c)
+                <div class="p-5 flex items-center justify-between group">
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">{{ $c->contribution_date->format('d/m/Y') }}</p>
+                        <p class="text-xs text-slate-500 font-medium italic">{{ $c->notes ?: 'Versement épargne' }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-success">+{{ number_format($c->amount, 0, ',', ' ') }}</p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">FCFA</p>
+                    </div>
+                </div>
+                @empty
+                <div class="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
+                    Aucune contribution
+                </div>
+                @endforelse
+            </div>
         </div>
     </div>
 

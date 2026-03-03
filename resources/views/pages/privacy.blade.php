@@ -40,7 +40,7 @@
                 <hr class="border-slate-100">
                 <div>
                     <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="mail" class="w-5 h-5 text-primary"></i> 6. Contact</h2>
-                    <p class="text-sm text-slate-600 leading-relaxed">Pour toute demande relative à la confidentialité de vos données, contactez-nous à l'adresse : <span class="font-bold text-slate-800">info@financezen.miguelmissetcho.com</span></p>
+                    <p class="text-sm text-slate-600 leading-relaxed">Pour toute demande relative à la confidentialité de vos données, contactez-nous à l'adresse : <span class="font-bold text-slate-800">info@financezen.com</span></p>
                 </div>
             </div>
         </div>

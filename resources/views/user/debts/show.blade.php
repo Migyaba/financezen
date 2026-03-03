@@ -48,28 +48,53 @@
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
                 <h3 class="font-bold text-slate-800 dark:text-white">Historique des paiements</h3>
             </div>
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Source</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Notes</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-                    @forelse($debt->payments as $payment)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
-                        <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $payment->payment_date->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-sm font-black text-success">{{ number_format($payment->amount, 0, ',', ' ') }} FCFA</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">{{ $payment->source }}</span></td>
-                        <td class="px-6 py-4 text-sm text-slate-500">{{ $payment->notes ?? '-' }}</td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="4" class="px-6 py-12 text-center text-slate-500 text-sm">Aucun paiement enregistré.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+            
+            <!-- Desktop Table -->
+            <div class="hidden md:block">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Source</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        @forelse($debt->payments as $payment)
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
+                            <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $payment->payment_date->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 text-sm font-black text-success">{{ number_format($payment->amount, 0, ',', ' ') }} FCFA</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">{{ $payment->source }}</span></td>
+                            <td class="px-6 py-4 text-sm text-slate-500">{{ $payment->notes ?? '-' }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="4" class="px-6 py-12 text-center text-slate-500 text-sm">Aucun paiement enregistré.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-700">
+                @forelse($debt->payments as $p)
+                <div class="p-5 flex items-center justify-between group">
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">{{ $p->payment_date->format('d/m/Y') }}</p>
+                        <p class="text-xs text-slate-500 font-medium italic mb-1">{{ $p->notes ?: 'Paiement direct' }}</p>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-[8px] font-bold uppercase tracking-tighter text-slate-500">{{ $p->source }}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-success">+{{ number_format($p->amount, 0, ',', ' ') }}</p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">FCFA</p>
+                    </div>
+                </div>
+                @empty
+                <div class="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
+                    Aucun paiement
+                </div>
+                @endforelse
+            </div>
         </div>
     </div>
 
