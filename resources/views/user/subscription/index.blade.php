@@ -122,30 +122,54 @@
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
                 <h3 class="font-bold text-slate-800 dark:text-white">Historique des paiements</h3>
             </div>
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
-                        <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Statut</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
-                    @foreach($payments as $p)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
-                        <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $p->created_at->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-sm font-black text-slate-800 dark:text-white">{{ number_format($p->amount, 0, ',', ' ') }} {{ $p->currency }}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
-                                {{ $p->status == 'success' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : '' }}
-                                {{ $p->status == 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : '' }}
-                                {{ $p->status == 'failed' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : '' }}
-                            ">{{ $p->status }}</span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+            <!-- Desktop Table -->
+            <div class="hidden md:block">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Date</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Montant</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest text-left">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        @foreach($payments as $p)
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
+                            <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $p->created_at->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 text-sm font-black text-slate-800 dark:text-white">{{ number_format($p->amount, 0, ',', ' ') }} {{ $p->currency }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
+                                    {{ $p->status == 'success' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : '' }}
+                                    {{ $p->status == 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : '' }}
+                                    {{ $p->status == 'failed' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : '' }}
+                                ">{{ $p->status }}</span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-700">
+                @foreach($payments as $p)
+                <div class="p-5 flex items-center justify-between group">
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">{{ $p->created_at->format('d/m/Y') }}</p>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-tighter
+                            {{ $p->status == 'success' ? 'bg-emerald-100 text-emerald-700' : '' }}
+                            {{ $p->status == 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
+                            {{ $p->status == 'failed' ? 'bg-red-100 text-red-700' : '' }}
+                        ">{{ $p->status }}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-slate-800 dark:text-white">{{ number_format($p->amount, 0, ',', ' ') }}</p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">{{ $p->currency }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
         @endif
     </div>

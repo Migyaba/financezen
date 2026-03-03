@@ -33,6 +33,31 @@ class BudgetController extends Controller
             $budget->update(['salary_planned' => auth()->user()->monthly_salary]);
         }
 
+        // AUTO-FILL: Préremplir les revenus fixes depuis le profil
+        $fixedIncomes = [
+            'Salaire fixe' => auth()->user()->monthly_salary,
+        ];
+
+        foreach ($fixedIncomes as $categoryName => $amount) {
+            if ($amount > 0) {
+                $category = BudgetCategory::where('name', $categoryName)
+                    ->where(function($q) { $q->where('user_id', auth()->id())->orWhere('is_default', true); })
+                    ->where('type', 'income')
+                    ->first();
+                
+                if ($category) {
+                    $item = $budget->items()->where('category_id', $category->id)->first();
+                    if (!$item || $item->amount_planned == 0) {
+                        $budget->items()->updateOrCreate(
+                            ['category_id' => $category->id],
+                            ['amount_planned' => $amount]
+                        );
+                    }
+                }
+            }
+        }
+
+        // AUTO-FILL: Préremplir les dépenses fixes depuis le profil
         $fixedExpenses = [
             'Loyer' => auth()->user()->loyer,
             'Eau + Électricité' => auth()->user()->eau_electricite,

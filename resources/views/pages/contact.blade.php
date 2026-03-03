@@ -15,7 +15,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-800 mb-1">Par Email</h3>
-                                <p class="text-sm text-slate-500">info@financezen.miguelmissetcho.com</p>
+                                <p class="text-sm text-slate-500">info@financezen.com</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
@@ -24,7 +24,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-800 mb-1">Par Téléphone</h3>
-                                <p class="text-sm text-slate-500">+229 00 00 00 00</p>
+                                <p class="text-sm text-slate-500">+229 01 61 78 59 62</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
@@ -33,7 +33,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-800 mb-1">Temps de réponse</h3>
-                                <p class="text-sm text-slate-500">Nous répondons en moins de 24 heures, du lundi au vendredi.</p>
+                                <p class="text-sm text-slate-500">Nous répondons en moins de 24 heures, du lundi au samedi.</p>
                             </div>
                         </div>
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
@@ -98,7 +99,7 @@ class TransactionController extends Controller
 
     public function update(Request $request, \App\Models\Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
+        Gate::authorize('update', $transaction);
 
         $validated = $request->validate([
             'category_id' => 'required|exists:budget_categories,id',
@@ -117,7 +118,7 @@ class TransactionController extends Controller
 
     public function destroy(\App\Models\Transaction $transaction)
     {
-        $this->authorize('delete', $transaction);
+        Gate::authorize('delete', $transaction);
         $transaction->delete();
         return back()->with('success', 'Transaction supprimée.');
     }

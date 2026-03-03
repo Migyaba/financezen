@@ -62,8 +62,9 @@
         </div>
 
         <!-- REVENUS TAB -->
-        <div x-show="activeTab === 'incomes'" x-transition class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="overflow-x-auto">
+        <div x-show="activeTab === 'incomes'" x-transition>
+            <!-- Desktop view -->
+            <div class="hidden md:block bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
                 <table class="w-full">
                     <thead class="bg-slate-50 dark:bg-slate-900/50">
                         <tr>
@@ -71,7 +72,6 @@
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-1/4">Montant Prévu</th>
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-1/4">Montant Réel</th>
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right">Écart</th>
-                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
@@ -79,9 +79,9 @@
                         @php
                             $planned = $budgetItems->firstWhere('category_id', $cat->id)?->amount_planned ?? 0;
                             $actual = $groupedTransactions->has($cat->id) ? $groupedTransactions[$cat->id]->sum('amount') : 0;
-                            $diff = $actual - $planned; // Positive diff is good for incomes
+                            $diff = $actual - $planned;
                         @endphp
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background: {{ $cat->color }}"><i data-lucide="{{ $cat->icon }}" class="w-4 h-4"></i></div>
@@ -89,29 +89,68 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <form action="{{ route('budget.item.update') }}" method="POST" class="flex justify-end relative group">
+                                <form action="{{ route('budget.item.update') }}" method="POST" class="flex justify-end">
                                     @csrf
                                     <input type="hidden" name="month" value="{{ $month }}">
                                     <input type="hidden" name="year" value="{{ $year }}">
                                     <input type="hidden" name="category_id" value="{{ $cat->id }}">
-                                    <input type="number" name="amount_planned" value="{{ $planned }}" onchange="this.form.submit()" class="w-32 bg-transparent border-0 border-b border-transparent focus:border-success focus:ring-0 text-right font-bold p-1 text-sm text-slate-600 dark:text-slate-300 group-hover:bg-slate-100 dark:group-hover:bg-slate-900 rounded inline-block">
+                                    <input type="number" name="amount_planned" value="{{ $planned }}" onblur="this.form.submit()" class="w-32 bg-transparent border border-transparent focus:border-success focus:ring-0 text-right font-bold p-1 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 rounded inline-block transition">
                                 </form>
                             </td>
                             <td class="px-6 py-4 text-right font-black text-slate-800 dark:text-white">{{ number_format($actual, 0, ',', ' ') }}</td>
                             <td class="px-6 py-4 text-right font-bold text-sm {{ $diff >= 0 ? 'text-success' : 'text-danger' }}">{{ $diff > 0 ? '+' : '' }}{{ number_format($diff, 0, ',', ' ') }}</td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="text-[10px] text-slate-400">Modifier prévu inline</div>
-                            </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+
+            <!-- Mobile view -->
+            <div class="md:hidden space-y-4">
+                @foreach($categories->where('type', 'income') as $cat)
+                @php
+                    $planned = $budgetItems->firstWhere('category_id', $cat->id)?->amount_planned ?? 0;
+                    $actual = $groupedTransactions->has($cat->id) ? $groupedTransactions[$cat->id]->sum('amount') : 0;
+                    $diff = $actual - $planned;
+                @endphp
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background: {{ $cat->color }}"><i data-lucide="{{ $cat->icon }}" class="w-4 h-4"></i></div>
+                            <span class="text-sm font-black text-slate-800 dark:text-white">{{ $cat->name }}</span>
+                        </div>
+                        <div class="text-right">
+                           <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Réel</p>
+                           <p class="text-base font-black text-slate-800 dark:text-white">{{ number_format($actual, 0, ',', ' ') }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50 dark:border-slate-700/50">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Prévu (Modifier)</p>
+                            <form action="{{ route('budget.item.update') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="month" value="{{ $month }}">
+                                <input type="hidden" name="year" value="{{ $year }}">
+                                <input type="hidden" name="category_id" value="{{ $cat->id }}">
+                                <input type="number" name="amount_planned" value="{{ $planned }}" onblur="this.form.submit()" class="w-full text-sm font-bold bg-slate-50 dark:bg-slate-900 border-0 rounded-lg p-2 focus:ring-success">
+                            </form>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Écart</p>
+                            <p class="text-sm font-bold {{ $diff >= 0 ? 'text-success' : 'text-danger' }}">
+                                {{ $diff > 0 ? '+' : '' }}{{ number_format($diff, 0, ',', ' ') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
 
         <!-- DÉPENSES TAB -->
-        <div x-show="activeTab === 'expenses'" x-transition class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-            <div class="overflow-x-auto">
+        <div x-show="activeTab === 'expenses'" x-transition>
+            <!-- Desktop view -->
+            <div class="hidden md:block bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
                 <table class="w-full">
                     <thead class="bg-slate-50 dark:bg-slate-900/50">
                         <tr>
@@ -119,7 +158,7 @@
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-1/5">Prévu</th>
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-1/5">Réel</th>
                             <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-1/6">Écart</th>
-                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-left min-w-[100px]">Progression</th>
+                            <th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-left">Progression</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
@@ -127,11 +166,11 @@
                         @php
                             $planned = $budgetItems->firstWhere('category_id', $cat->id)?->amount_planned ?? 0;
                             $actual = $groupedTransactions->has($cat->id) ? $groupedTransactions[$cat->id]->sum('amount') : 0;
-                            $diff = $planned - $actual; // Positive is good (saved money)
+                            $diff = $planned - $actual;
                             $pct = $planned > 0 ? round(($actual / $planned) * 100) : ($actual > 0 ? 100 : 0);
                             $pctColor = $pct > 100 ? 'bg-danger' : ($pct > 80 ? 'bg-warning' : 'bg-primary');
                         @endphp
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background: {{ $cat->color }}"><i data-lucide="{{ $cat->icon }}" class="w-4 h-4"></i></div>
@@ -139,26 +178,70 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <form action="{{ route('budget.item.update') }}" method="POST" class="flex justify-end relative group">
+                                <form action="{{ route('budget.item.update') }}" method="POST" class="flex justify-end group">
                                     @csrf
                                     <input type="hidden" name="month" value="{{ $month }}">
                                     <input type="hidden" name="year" value="{{ $year }}">
                                     <input type="hidden" name="category_id" value="{{ $cat->id }}">
-                                    <input type="number" name="amount_planned" value="{{ $planned }}" onkeydown="if(event.key === 'Enter') this.form.submit();" onblur="this.form.submit()" class="w-full max-w-[120px] bg-transparent border border-transparent focus:border-danger hover:border-slate-300 dark:hover:border-slate-600 focus:ring-0 text-right font-bold p-1 px-2 text-sm text-slate-600 dark:text-slate-300 rounded transition duration-200">
+                                    <input type="number" name="amount_planned" value="{{ $planned }}" onblur="this.form.submit()" class="w-full max-w-[120px] bg-transparent border border-transparent focus:border-danger hover:bg-slate-50 dark:hover:bg-slate-900 focus:ring-0 text-right font-bold p-1 px-2 text-sm text-slate-600 dark:text-slate-300 rounded transition duration-200">
                                 </form>
                             </td>
                             <td class="px-6 py-4 text-right font-black text-slate-800 dark:text-white">{{ number_format($actual, 0, ',', ' ') }}</td>
                             <td class="px-6 py-4 text-right font-bold text-sm {{ $diff < 0 ? 'text-danger' : 'text-success' }}">{{ $diff >= 0 ? '+' : '' }}{{ number_format($diff, 0, ',', ' ') }}</td>
                             <td class="px-6 py-4">
                                 <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full {{ $pctColor }} rounded-full" style="width: {{ min($pct, 100) }}%"></div>
+                                    <div class="h-full {{ $pctColor }} rounded-full transition-all duration-700" style="width: {{ min($pct, 100) }}%"></div>
                                 </div>
-                                <div class="text-[10px] text-slate-400 mt-1 min-w-max">{{ $pct }}% consommé</div>
+                                <div class="text-[10px] text-slate-400 mt-1">{{ $pct }}% consommé</div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile view -->
+            <div class="md:hidden space-y-4">
+                @foreach($categories->where('type', 'expense') as $cat)
+                @php
+                    $planned = $budgetItems->firstWhere('category_id', $cat->id)?->amount_planned ?? 0;
+                    $actual = $groupedTransactions->has($cat->id) ? $groupedTransactions[$cat->id]->sum('amount') : 0;
+                    $diff = $planned - $actual;
+                    $pct = $planned > 0 ? round(($actual / $planned) * 100) : ($actual > 0 ? 100 : 0);
+                    $pctColor = $pct > 100 ? 'text-danger' : ($pct > 80 ? 'text-warning' : 'text-primary');
+                    $barColor = $pct > 100 ? 'bg-danger' : ($pct > 80 ? 'bg-warning' : 'bg-primary');
+                @endphp
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style="background: {{ $cat->color }}"><i data-lucide="{{ $cat->icon }}" class="w-4 h-4"></i></div>
+                            <span class="text-sm font-black text-slate-800 dark:text-white">{{ $cat->name }}</span>
+                        </div>
+                        <span class="text-sm font-black {{ $diff < 0 ? 'text-danger' : 'text-success' }}">{{ $diff >= 0 ? '+' : '' }}{{ number_format($diff, 0, ',', ' ') }}</span>
+                    </div>
+
+                    <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
+                        <div class="h-full {{ $barColor }} rounded-full" style="width: {{ min($pct, 100) }}%"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50 dark:border-slate-700/50">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Prévu (Modifier)</p>
+                            <form action="{{ route('budget.item.update') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="month" value="{{ $month }}">
+                                <input type="hidden" name="year" value="{{ $year }}">
+                                <input type="hidden" name="category_id" value="{{ $cat->id }}">
+                                <input type="number" name="amount_planned" value="{{ $planned }}" onblur="this.form.submit()" class="w-full text-sm font-bold bg-slate-50 dark:bg-slate-900 border-0 rounded-lg p-2 focus:ring-danger">
+                            </form>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Réel / %</p>
+                            <p class="text-sm font-bold text-slate-800 dark:text-white">{{ number_format($actual, 0, ',', ' ') }} <span class="ml-1 {{ $pctColor }}">({{ $pct }}%)</span></p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
 
