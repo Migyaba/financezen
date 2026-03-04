@@ -57,8 +57,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/budget/item', [BudgetController::class, 'updateItem'])->name('budget.item.update');
         Route::get('/budget/{year}/{month}', [BudgetController::class, 'show'])->name('budget.show');
 
-        Route::resource('transactions', TransactionController::class);
         Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
+        Route::get('/transactions/export/pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export.pdf');
+        Route::resource('transactions', TransactionController::class);
 
         Route::resource('debts', DebtController::class);
         Route::post('/debts/{debt}/payment', [DebtController::class, 'addPayment'])->name('debts.payment');

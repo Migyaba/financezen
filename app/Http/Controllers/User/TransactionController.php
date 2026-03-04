@@ -5,6 +5,8 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
@@ -125,22 +127,96 @@ class TransactionController extends Controller
 
     public function export(Request $request)
     {
-        $transactions = auth()->user()->transactions()->with('category')->latest('transaction_date')->get();
+        $query = auth()->user()->transactions()->with('category');
+
+        // Apply same filters as index
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('month')) {
+            $monthParts = explode('-', $request->month);
+            if (count($monthParts) == 2) {
+                $query->whereYear('transaction_date', $monthParts[0])
+                      ->whereMonth('transaction_date', $monthParts[1]);
+            }
+        }
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('description', 'like', "%$s%")
+                  ->orWhere('notes', 'like', "%$s%");
+            });
+        }
+
+        $transactions = $query->latest('transaction_date')->get();
         
-        $csvData = "Date,Type,Categorie,Montant,Methode,Description\n";
+        $csvData = "\xEF\xBB\xBFDate;Type;Categorie;Montant;Methode;Description\n";
         foreach ($transactions as $tx) {
-            $date = $tx->transaction_date->format('Y-m-d');
-            $type = $tx->type;
+            $date = $tx->transaction_date->format('d/m/Y');
+            $type = $tx->type === 'income' ? 'Revenu' : 'Dépense';
             $cat = $tx->category->name ?? '';
             $amount = $tx->amount;
             $method = $tx->payment_method;
-            $desc = str_replace('"', '""', $tx->description ?? '');
+            $desc = str_replace(';', ',', $tx->description ?? '');
             
-            $csvData .= "$date,$type,\"$cat\",$amount,$method,\"$desc\"\n";
+            $csvData .= "$date;$type;\"$cat\";$amount;$method;\"$desc\"\n";
         }
         
         return response($csvData)
-            ->header('Content-Type', 'text/csv')
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="transactions_financezen.csv"');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = auth()->user()->transactions()->with('category');
+
+        // Apply filters
+        if ($request->filled('type')) { $query->where('type', $request->type); }
+        if ($request->filled('category_id')) { $query->where('category_id', $request->category_id); }
+        if ($request->filled('month')) {
+            $monthParts = explode('-', $request->month);
+            if (count($monthParts) == 2) {
+                $query->whereYear('transaction_date', $monthParts[0])
+                      ->whereMonth('transaction_date', $monthParts[1]);
+            }
+        }
+        if ($request->filled('payment_method')) { $query->where('payment_method', $request->payment_method); }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('description', 'like', "%$s%")->orWhere('notes', 'like', "%$s%");
+            });
+        }
+
+        $transactions = $query->latest('transaction_date')->get();
+        $user = auth()->user();
+        
+        // Define date range for header based on results or current month
+        $startDate = $transactions->min('transaction_date') ?? now()->startOfMonth();
+        $endDate = $transactions->max('transaction_date') ?? now()->endOfMonth();
+        
+        $income = $transactions->where('type', 'income')->sum('amount');
+        $expense = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
+        
+        $categoriesData = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])
+            ->groupBy('category_id')
+            ->map(function ($row) {
+                return [
+                    'name' => $row->first()->category->name ?? 'DIVERS',
+                    'total' => $row->sum('amount')
+                ];
+            })->sortByDesc('total');
+
+        $pdf = Pdf::loadView('user.reports.pdf', compact('user', 'startDate', 'endDate', 'transactions', 'income', 'expense', 'categoriesData'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("export_transactions_financezen.pdf");
     }
 }

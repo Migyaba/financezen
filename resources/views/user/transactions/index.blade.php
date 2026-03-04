@@ -77,12 +77,19 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <a href="{{ route('transactions.export') }}" class="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center justify-center gap-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-600">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Export</span> CSV
-                </a>
-                <button @click="openModal('add-transaction')" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-2 flex-1 sm:flex-none">
+                    <a href="{{ route('transactions.export', request()->query()) }}" class="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center justify-center gap-2 text-[10px] sm:text-xs border border-slate-200 dark:border-slate-600" title="Exporter en CSV">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-success"></i>
+                        <span>CSV</span>
+                    </a>
+                    <a href="{{ route('transactions.export.pdf', request()->query()) }}" class="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center justify-center gap-2 text-[10px] sm:text-xs border border-slate-200 dark:border-slate-600" title="Exporter en PDF">
+                        <i data-lucide="file-text" class="w-4 h-4 text-danger"></i>
+                        <span>PDF</span>
+                    </a>
+                </div>
+
+                <button @click="$dispatch('open-quick-add')" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition flex items-center justify-center gap-2 text-xs sm:text-sm">
                     <i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                     <span class="hidden xs:inline">Nouvelle</span> Transaction
                 </button>
@@ -235,123 +242,6 @@
             </div>
         </div>
 
-        {{-- ============================================ --}}
-        {{-- MODAL: Ajouter une Transaction --}}
-        {{-- ============================================ --}}
-        <div id="add-transaction" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" @keydown.escape.window="closeModal()">
-            <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" @click.away="closeModal()">
-                <!-- Header -->
-                <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50 flex-shrink-0">
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white">Nouvelle Transaction</h3>
-                    <button @click="closeModal()" class="p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                        <i data-lucide="x" class="w-5 h-5 text-slate-400"></i>
-                    </button>
-                </div>
-                <!-- Body -->
-                <div class="p-8 overflow-y-auto">
-                    <form action="{{ route('transactions.store') }}" method="POST" class="space-y-5" x-data="{ cat: '{{ old('category_id') }}', isRecurring: {{ old('is_recurring') ? 'true' : 'false' }} }">
-                        @csrf
-
-                        @if ($errors->any())
-                            <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl text-sm text-red-600 dark:text-red-400">
-                                <p class="font-bold flex items-center gap-2 mb-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Erreur d'enregistrement</p>
-                                <ul class="list-disc list-inside">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Type</label>
-                                <select name="type" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
-                                    <option value="expense" {{ old('type') == 'expense' ? 'selected' : '' }}>Dépense</option>
-                                    <option value="income" {{ old('type') == 'income' ? 'selected' : '' }}>Revenu</option>
-                                    <option value="debt_payment" {{ old('type') == 'debt_payment' ? 'selected' : '' }}>Remboursement Dette</option>
-                                    <option value="savings" {{ old('type') == 'savings' ? 'selected' : '' }}>Épargne</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Catégorie</label>
-                                <select name="category_id" x-model="cat" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
-                                    <option value="">Sélectionner...</option>
-                                    <option value="new" class="font-bold text-primary">+ Créer une nouvelle catégorie</option>
-                                    <optgroup label="── Dépenses ──">
-                                        @foreach($categories->where('type', 'expense') as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                    <optgroup label="── Revenus ──">
-                                        @foreach($categories->where('type', 'income') as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                </select>
-                                
-                                <div x-cloak x-show="cat === 'new'" class="mt-3">
-                                    <input type="text" name="new_category_name" value="{{ old('new_category_name') }}" placeholder="Nom de la nouvelle catégorie..." class="w-full rounded-xl border-primary dark:bg-slate-900 h-12 focus:ring-primary focus:border-primary" x-bind:required="cat === 'new'">
-                                    <p class="text-[10px] text-slate-500 mt-1">Elle sera créée automatiquement.</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Montant</label>
-                                <input type="number" name="amount" value="{{ old('amount') }}" required step="0.01" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-bold focus:ring-primary focus:border-primary" placeholder="0.00">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Date</label>
-                                <input type="date" name="transaction_date" required value="{{ old('transaction_date', date('Y-m-d')) }}" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
-                            </div>
-
-                            <div class="col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Description</label>
-                                <input type="text" name="description" value="{{ old('description') }}" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary" placeholder="Ex: Courses mensuelles">
-                            </div>
-
-                            <div class="col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Mode de paiement</label>
-                                <select name="payment_method" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
-                                    <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Espèce</option>
-                                    <option value="mobile_money" {{ old('payment_method') == 'mobile_money' ? 'selected' : '' }}>Mobile Money</option>
-                                    <option value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>Carte Bancaire</option>
-                                    <option value="transfer" {{ old('payment_method') == 'transfer' ? 'selected' : '' }}>Virement</option>
-                                    <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Autre</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-span-2 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" name="is_recurring" x-model="isRecurring" class="w-5 h-5 rounded-md border-slate-300 dark:border-slate-500 text-primary focus:ring-primary dark:bg-slate-800">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Transaction récurrente</span>
-                                        <p class="text-[10px] text-slate-500">Ex: Loyer, abonnement, salaire</p>
-                                    </div>
-                                </label>
-
-                                <div x-cloak x-show="isRecurring" class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
-                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Fréquence</label>
-                                    <select name="recurring_frequency" class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary" x-bind:required="isRecurring">
-                                        <option value="monthly" {{ old('recurring_frequency') == 'monthly' ? 'selected' : '' }}>Mensuelle (tous les mois)</option>
-                                        <option value="weekly" {{ old('recurring_frequency') == 'weekly' ? 'selected' : '' }}>Hebdomadaire (toutes les semaines)</option>
-                                        <option value="yearly" {{ old('recurring_frequency') == 'yearly' ? 'selected' : '' }}>Annuelle (tous les ans)</option>
-                                        <option value="daily" {{ old('recurring_frequency') == 'daily' ? 'selected' : '' }}>Journalière (tous les jours)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 flex gap-3">
-                            <button type="button" @click="closeModal()" class="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">Annuler</button>
-                            <button type="submit" class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition">Enregistrer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
         {{-- ============================================ --}}
         {{-- MODAL: Modifier une Transaction --}}
@@ -532,33 +422,8 @@
                     this.deleteData = { id, categoryName, amount };
                     this.showDeleteModal = true;
                     this.$nextTick(() => lucide.createIcons());
-                },
-
-                openModal(id) {
-                    const modal = document.getElementById(id);
-                    if (modal) {
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
-                    }
-                },
-
-                closeModal() {
-                    document.querySelectorAll('#add-transaction').forEach(m => {
-                        m.classList.add('hidden');
-                        m.classList.remove('flex');
-                    });
-                },
+                }
             }
         }
-
-        @if ($errors->any())
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('add-transaction');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-        });
-        @endif
     </script>
 </x-app-layout>
