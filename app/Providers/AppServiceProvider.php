@@ -32,7 +32,12 @@ class AppServiceProvider extends ServiceProvider
                     ->orWhere('is_default', true)
                     ->orderBy('type')
                     ->orderBy('name')
-                    ->get());
+                    ->get()
+                    // Dédupliquer par nom : priorité à la catégorie personnelle (user_id) sur la catégorie par défaut
+                    ->groupBy(fn($cat) => strtolower(trim($cat->name)))
+                    ->map(fn($group) => $group->sortByDesc(fn($c) => $c->user_id !== null)->first())
+                    ->values()
+                    ->sortBy('type'));
             }
         });
     }

@@ -18,22 +18,26 @@ class WebhookController extends Controller
      */
     public function fedapay(Request $request)
     {
-        $payload = $request->all();
+        Log::info('FedaPay Webhook received', [
+            'headers' => $request->headers->all()
+        ]);
 
-        Log::info('FedaPay Webhook received', $payload);
-
-        // Verify webhook signature if secret is configured
+        $payload = $request->getContent();
+        $sigHeader = $request->header('X-Fedapay-Signature');
         $webhookSecret = config('fedapay.webhook_secret');
+
         if ($webhookSecret) {
-            $signature = $request->header('X-Fedapay-Signature');
-            if (!$signature || !$this->verifySignature($request->getContent(), $signature, $webhookSecret)) {
-                Log::warning('FedaPay Webhook: Invalid signature');
+            try {
+                \FedaPay\Webhook::constructEvent($payload, $sigHeader, $webhookSecret);
+            } catch (\Exception $e) {
+                Log::warning('FedaPay Webhook: Signature verification failed', ['error' => $e->getMessage()]);
                 return response()->json(['error' => 'Invalid signature'], 403);
             }
         }
 
-        $event = $payload['event'] ?? null;
-        $entity = $payload['entity'] ?? [];
+        $data = json_decode($payload, true);
+        $event = $data['event'] ?? null;
+        $entity = $data['entity'] ?? [];
 
         if (!$event) {
             return response()->json(['error' => 'No event'], 400);
@@ -113,11 +117,5 @@ class WebhookController extends Controller
 
         // Send payment failed email
         Mail::to($subscription->user->email)->queue(new PaymentFailed($subscription->user));
-    }
-
-    private function verifySignature(string $payload, string $signature, string $secret): bool
-    {
-        $computed = hash_hmac('sha256', $payload, $secret);
-        return hash_equals($computed, $signature);
     }
 }
