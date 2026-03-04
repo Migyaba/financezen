@@ -33,12 +33,12 @@ class UserObserver
     private function syncBudgets(User $user): void
     {
         $fieldsToSync = [
-            'monthly_salary' => 'Salaire fixe',
-            'loyer'          => 'Loyer',
+            'monthly_salary'  => 'Salaire fixe',
+            'loyer'           => 'Loyer',
             'eau_electricite' => 'Eau & Électricité',
-            'internet'       => 'Internet',
-            'nourriture'     => 'Nourriture',
-            'essence'        => 'Essence',
+            'internet'        => 'Internet',
+            'nourriture'      => 'Nourriture',
+            'essence'         => 'Essence',
         ];
 
         $changedFields = [];
@@ -52,6 +52,9 @@ class UserObserver
             return;
         }
 
+        // ✅ S'assurer qu'un budget existe pour le mois en cours
+        $this->ensureCurrentBudgetExists($user);
+
         $now = now();
         $budgets = $user->budgets()
             ->where(function ($q) use ($now) {
@@ -62,13 +65,13 @@ class UserObserver
             })->get();
 
         foreach ($budgets as $budget) {
-            // Update Salary in Budget Table
+            // Mettre à jour le salaire prévu dans la table budgets
             if (isset($changedFields['monthly_salary'])) {
                 $budget->update(['salary_planned' => (float)$user->monthly_salary]);
             }
 
             foreach ($changedFields as $field => $catName) {
-                // Find correct category (prioritizing user-specific)
+                // Trouver la catégorie (priorité : catégorie utilisateur > catégorie par défaut)
                 $category = \App\Models\BudgetCategory::where('name', $catName)
                     ->where(function ($q) use ($user) {
                         $q->where('user_id', $user->id)->orWhere('is_default', true);
@@ -76,25 +79,25 @@ class UserObserver
                     ->orderByRaw('user_id IS NOT NULL DESC')
                     ->first();
 
-                // 🚀 AUTO-CREATION: Si la catégorie n'existe pas, on la crée !
+                // 🚀 AUTO-CRÉATION : Si la catégorie n'existe pas, on la crée !
                 if (!$category) {
                     $defaults = [
-                        'Salaire fixe' => ['type' => 'income', 'icon' => 'briefcase', 'color' => '#10B981'],
-                        'Loyer' => ['type' => 'expense', 'icon' => 'home', 'color' => '#F59E0B'],
-                        'Eau & Électricité' => ['type' => 'expense', 'icon' => 'zap', 'color' => '#0EA5E9'],
-                        'Internet' => ['type' => 'expense', 'icon' => 'globe', 'color' => '#6366F1'],
-                        'Nourriture' => ['type' => 'expense', 'icon' => 'shopping-cart', 'color' => '#EF4444'],
-                        'Essence' => ['type' => 'expense', 'icon' => 'fuel', 'color' => '#3B82F6'],
+                        'Salaire fixe'      => ['type' => 'income',   'icon' => 'briefcase',    'color' => '#10B981'],
+                        'Loyer'             => ['type' => 'expense',  'icon' => 'home',          'color' => '#F59E0B'],
+                        'Eau & Électricité' => ['type' => 'expense',  'icon' => 'zap',           'color' => '#0EA5E9'],
+                        'Internet'          => ['type' => 'expense',  'icon' => 'globe',         'color' => '#6366F1'],
+                        'Nourriture'        => ['type' => 'expense',  'icon' => 'shopping-cart', 'color' => '#EF4444'],
+                        'Essence'           => ['type' => 'expense',  'icon' => 'fuel',          'color' => '#3B82F6'],
                     ];
 
                     $spec = $defaults[$catName] ?? ['type' => 'expense', 'icon' => 'tag', 'color' => '#64748B'];
-                    
+
                     $category = \App\Models\BudgetCategory::create([
-                        'user_id' => $user->id,
-                        'name' => $catName,
-                        'type' => $spec['type'],
-                        'icon' => $spec['icon'],
-                        'color' => $spec['color'],
+                        'user_id'    => $user->id,
+                        'name'       => $catName,
+                        'type'       => $spec['type'],
+                        'icon'       => $spec['icon'],
+                        'color'      => $spec['color'],
                         'is_default' => false,
                     ]);
                 }
@@ -106,6 +109,32 @@ class UserObserver
                     );
                 }
             }
+        }
+    }
+
+    /**
+     * Auto-créer le budget du mois en cours s'il n'existe pas encore.
+     * Ainsi, même si l'utilisateur n'a jamais visité la page Budget,
+     * ses données de profil y seront bien reflétées.
+     */
+    private function ensureCurrentBudgetExists(User $user): void
+    {
+        $now = now();
+
+        $exists = $user->budgets()
+            ->where('month', $now->month)
+            ->where('year', $now->year)
+            ->exists();
+
+        if (!$exists) {
+            $user->budgets()->create([
+                'month'            => $now->month,
+                'year'             => $now->year,
+                'salary_planned'   => (float)($user->monthly_salary ?? 0),
+                'salary_actual'    => 0,
+                'freelance_planned' => 0,
+                'freelance_actual'  => 0,
+            ]);
         }
     }
 
