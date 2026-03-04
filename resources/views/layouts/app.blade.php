@@ -154,7 +154,7 @@
         {{-- FAB: Bouton flottant Ajout Rapide --}}
         {{-- ============================================ --}}
         @auth
-        <div x-data="quickTransaction()" @open-quick-add.window="showQuickAdd = true" x-init="@if($errors->any()) showQuickAdd = true @endif" x-cloak>
+        <div x-data="quickTransaction()" @open-quick-add.window="showQuickAdd = true" x-init="@if($errors->quick_transaction->any()) showQuickAdd = true @endif" x-cloak>
             <!-- FAB Button -->
             <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3" x-data="{ showLabel: false }">
                 <!-- Tooltip label -->
@@ -204,11 +204,11 @@
                         <form action="{{ route('transactions.store') }}" method="POST" class="space-y-4 sm:space-y-5">
                             @csrf
 
-                            @if ($errors->any())
+                            @if ($errors->quick_transaction->any())
                                 <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-2xl text-xs text-red-600 dark:text-red-400">
                                     <p class="font-bold flex items-center gap-2 mb-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Erreur d'enregistrement</p>
                                     <ul class="list-disc list-inside opacity-80">
-                                        @foreach ($errors->all() as $error)
+                                        @foreach ($errors->quick_transaction->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach
                                     </ul>

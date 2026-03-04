@@ -13,14 +13,76 @@ class UserObserver
      */
     public function updated(User $user): void
     {
-        // ✅ AUTO-CRÉER/METTRE À JOUR LA DETTE si dette_initiale change
+        // 1. Sync Debt
         if ($user->wasChanged('dette_initiale')) {
             $this->syncDebt($user);
         }
 
-        // ✅ AUTO-CRÉER/METTRE À JOUR LE FONDS D'URGENCE si objectif_fonds_urgence change
+        // 2. Sync Savings
         if ($user->wasChanged('objectif_fonds_urgence')) {
             $this->syncSavingsGoal($user);
+        }
+
+        // 3. Sync Budgets
+        $this->syncBudgets($user);
+    }
+
+    /**
+     * Propager les changements du profil vers les budgets existants (Présent et Futur)
+     */
+    private function syncBudgets(User $user): void
+    {
+        $fieldsToSync = [
+            'monthly_salary' => 'Salaire fixe',
+            'loyer'          => 'Loyer',
+            'eau_electricite' => 'Eau & Électricité',
+            'internet'       => 'Internet',
+            'nourriture'     => 'Nourriture',
+            'essence'        => 'Essence',
+        ];
+
+        $changedFields = [];
+        foreach ($fieldsToSync as $field => $catName) {
+            if ($user->wasChanged($field)) {
+                $changedFields[$field] = $catName;
+            }
+        }
+
+        if (empty($changedFields)) {
+            return;
+        }
+
+        $now = now();
+        $budgets = $user->budgets()
+            ->where(function ($q) use ($now) {
+                $q->where('year', '>', $now->year)
+                  ->orWhere(function ($sub) use ($now) {
+                      $sub->where('year', $now->year)->where('month', '>=', $now->month);
+                  });
+            })->get();
+
+        foreach ($budgets as $budget) {
+            // Update Salary in Budget Table
+            if (isset($changedFields['monthly_salary'])) {
+                $budget->update(['salary_planned' => (float)$user->monthly_salary]);
+            }
+
+            foreach ($changedFields as $field => $catName) {
+                // Find correct category (prioritizing user-specific)
+                $category = \App\Models\BudgetCategory::where('name', $catName)
+                    ->where(function ($q) use ($user) {
+                        $q->where('user_id', $user->id)->orWhere('is_default', true);
+                    })
+                    ->orderByRaw('user_id IS NOT NULL DESC') // User-specific first (user_id is not null)
+                    ->first();
+
+                if ($category) {
+                    $budget->items()->updateOrCreate(
+                        ['category_id' => $category->id],
+                        ['amount_planned' => (float)$user->$field]
+                    );
+                }
+            }
         }
     }
 

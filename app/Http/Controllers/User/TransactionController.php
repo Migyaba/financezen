@@ -61,7 +61,7 @@ class TransactionController extends Controller
         // Debug: Log qui está enregistrant une transaction
         \Log::info('Storing transaction for user: ' . auth()->id());
 
-        $validated = $request->validate([
+        $validated = $request->validateWithBag('quick_transaction', [
             'category_id' => 'required', // Can be 'new' or an ID
             'new_category_name' => 'required_if:category_id,new|nullable|string|max:255',
             'type' => 'required|in:income,expense,debt_payment,savings',
