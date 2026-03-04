@@ -32,25 +32,25 @@
                 </h2>
 
                 <!-- Countdown -->
-                <div x-data="countdownTimer('{{ $targetDate->toIso8601String() }}')" class="flex flex-wrap items-center justify-center gap-3 md:gap-5 mt-4 group">
-                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
-                        <span x-text="days" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
-                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Jours</span>
+                <div x-data="countdownTimer('{{ $targetDate->toIso8601String() }}')" class="flex items-center justify-center gap-2 md:gap-5 mt-4 group">
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-16 h-20 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="days" class="text-xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Jours</span>
                     </div>
-                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
-                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
-                        <span x-text="hours" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
-                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Heures</span>
+                    <div class="text-lg md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-16 h-20 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="hours" class="text-xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Heures</span>
                     </div>
-                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
-                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
-                        <span x-text="minutes" class="text-3xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
-                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Minutes</span>
+                    <div class="text-lg md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-16 h-20 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="minutes" class="text-xl md:text-5xl font-black {{ $activeSubscription ? 'text-emerald-500' : 'text-primary' }}">00</span>
+                        <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Min</span>
                     </div>
-                    <div class="text-2xl md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
-                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-20 h-24 md:w-24 md:h-28 justify-center rounded-2xl transition">
-                        <span x-text="seconds" class="text-3xl md:text-5xl font-black text-slate-600 dark:text-slate-300">00</span>
-                        <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">S</span>
+                    <div class="text-lg md:text-4xl font-black text-slate-300 dark:text-slate-600 animate-pulse">:</div>
+                    <div class="flex flex-col items-center bg-white dark:bg-slate-800 shadow-sm group-hover:shadow-md border border-slate-100 dark:border-slate-700 w-16 h-20 md:w-24 md:h-28 justify-center rounded-2xl transition">
+                        <span x-text="seconds" class="text-xl md:text-5xl font-black text-slate-600 dark:text-slate-300">00</span>
+                        <span class="text-[8px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Sec</span>
                     </div>
                 </div>
 
