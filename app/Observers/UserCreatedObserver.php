@@ -19,7 +19,7 @@ class UserCreatedObserver
             ['name' => 'Nourriture', 'type' => 'expense', 'color' => '#ef4444', 'icon' => 'utensils'],
             ['name' => 'Essence', 'type' => 'expense', 'color' => '#3b82f6', 'icon' => 'fuel'],
             ['name' => 'Internet', 'type' => 'expense', 'color' => '#6366f1', 'icon' => 'globe'],
-            ['name' => 'Eau + Électricité', 'type' => 'expense', 'color' => '#0ea5e9', 'icon' => 'zap'],
+            ['name' => 'Eau & Électricité', 'type' => 'expense', 'color' => '#0ea5e9', 'icon' => 'zap'],
             ['name' => 'Loisirs', 'type' => 'expense', 'color' => '#8b5cf6', 'icon' => 'gamepad2'],
             ['name' => 'Santé', 'type' => 'expense', 'color' => '#ec4899', 'icon' => 'heart-pulse'],
         ];

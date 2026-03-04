@@ -73,8 +73,31 @@ class UserObserver
                     ->where(function ($q) use ($user) {
                         $q->where('user_id', $user->id)->orWhere('is_default', true);
                     })
-                    ->orderByRaw('user_id IS NOT NULL DESC') // User-specific first (user_id is not null)
+                    ->orderByRaw('user_id IS NOT NULL DESC')
                     ->first();
+
+                // 🚀 AUTO-CREATION: Si la catégorie n'existe pas, on la crée !
+                if (!$category) {
+                    $defaults = [
+                        'Salaire fixe' => ['type' => 'income', 'icon' => 'briefcase', 'color' => '#10B981'],
+                        'Loyer' => ['type' => 'expense', 'icon' => 'home', 'color' => '#F59E0B'],
+                        'Eau & Électricité' => ['type' => 'expense', 'icon' => 'zap', 'color' => '#0EA5E9'],
+                        'Internet' => ['type' => 'expense', 'icon' => 'globe', 'color' => '#6366F1'],
+                        'Nourriture' => ['type' => 'expense', 'icon' => 'shopping-cart', 'color' => '#EF4444'],
+                        'Essence' => ['type' => 'expense', 'icon' => 'fuel', 'color' => '#3B82F6'],
+                    ];
+
+                    $spec = $defaults[$catName] ?? ['type' => 'expense', 'icon' => 'tag', 'color' => '#64748B'];
+                    
+                    $category = \App\Models\BudgetCategory::create([
+                        'user_id' => $user->id,
+                        'name' => $catName,
+                        'type' => $spec['type'],
+                        'icon' => $spec['icon'],
+                        'color' => $spec['color'],
+                        'is_default' => false,
+                    ]);
+                }
 
                 if ($category) {
                     $budget->items()->updateOrCreate(
