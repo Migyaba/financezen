@@ -14,7 +14,26 @@ class BudgetController extends Controller
         $month = $request->get('month', now()->month);
         $year = $request->get('year', now()->year);
 
-        $budget = auth()->user()->budgets()
+        $user = auth()->user();
+
+        // RÉPARATION AUTOMATIQUE : Si l'utilisateur n'a aucune catégorie (cas en ligne), on les crée
+        if ($user->budgetCategories()->count() === 0) {
+            $defaults = [
+                ['name' => 'Salaire fixe', 'type' => 'income', 'color' => '#10b981', 'icon' => 'briefcase'],
+                ['name' => 'Loyer', 'type' => 'expense', 'color' => '#f59e0b', 'icon' => 'home'],
+                ['name' => 'Nourriture', 'type' => 'expense', 'color' => '#ef4444', 'icon' => 'utensils'],
+                ['name' => 'Essence', 'type' => 'expense', 'color' => '#3b82f6', 'icon' => 'fuel'],
+                ['name' => 'Internet', 'type' => 'expense', 'color' => '#6366f1', 'icon' => 'globe'],
+                ['name' => 'Eau & Électricité', 'type' => 'expense', 'color' => '#0ea5e9', 'icon' => 'zap'],
+                ['name' => 'Loisirs', 'type' => 'expense', 'color' => '#8b5cf6', 'icon' => 'gamepad2'],
+                ['name' => 'Santé', 'type' => 'expense', 'color' => '#ec4899', 'icon' => 'heart-pulse'],
+            ];
+            foreach ($defaults as $cat) {
+                $user->budgetCategories()->create($cat);
+            }
+        }
+
+        $budget = $user->budgets()
             ->where('month', $month)
             ->where('year', $year)
             ->first();
@@ -86,11 +105,19 @@ class BudgetController extends Controller
             }
         }
 
-        $categories = BudgetCategory::where('user_id', auth()->id())
+        // RÉCUPÉRATION DES CATÉGORIES (Unique par nom, priorité à l'utilisateur)
+        $categories = BudgetCategory::where('user_id', $user->id)
             ->orWhere('is_default', true)
-            ->orderBy('type')
-            ->orderBy('order_index')
-            ->get();
+            ->get()
+            ->groupBy(function($cat) {
+                return $cat->type . '|' . strtolower($cat->name);
+            })
+            ->map(function($group) {
+                // On prend celle qui a un user_id (personnalisée) en priorité
+                return $group->sortByDesc('user_id')->first();
+            })
+            ->values()
+            ->sortBy('order_index');
 
         // Monthly transactions for this budget period
         $transactions = auth()->user()->transactions()
