@@ -184,6 +184,7 @@
                                                 <option value="USD" {{ old('currency', $user->currency) == 'USD' ? 'selected' : '' }}>Dollar US ($)</option>
                                                 <option value="CAD" {{ old('currency', $user->currency) == 'CAD' ? 'selected' : '' }}>Dollar Canadien (CAD)</option>
                                             </select>
+                                            <x-input-error :messages="$errors->get('currency')" />
                                         </div>
 
                                         <div class="space-y-2">
@@ -195,6 +196,7 @@
                                                     <i data-lucide="wallet" class="w-5 h-5"></i>
                                                 </div>
                                             </div>
+                                            <x-input-error :messages="$errors->get('monthly_salary')" />
                                             <p class="text-[10px] text-slate-400 italic font-medium ml-1">Utilisé comme base pour votre budget mensuel.</p>
                                         </div>
                                     </div>
@@ -205,6 +207,7 @@
                                         </label>
                                         <input id="freelance_split" name="freelance_split" type="text" value="{{ old('freelance_split', $user->freelance_split ?? '50/30/20') }}"
                                                class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl h-14 px-6 font-bold text-primary focus:ring-2 focus:ring-primary/20 transition-all text-center text-xl tracking-widest">
+                                        <x-input-error :messages="$errors->get('freelance_split')" />
                                         <p class="text-xs text-slate-500 leading-relaxed mt-2 text-center font-medium">
                                             Format: <span class="bg-primary/10 text-primary px-1.5 py-0.5 rounded">Besoins / Envies / Épargne</span>. Utile pour automatiser vos objectifs de virements.
                                         </p>
@@ -238,6 +241,7 @@
                                         </label>
                                         <input id="{{ $field['id'] }}" name="{{ $field['id'] }}" type="number" step="0.01" value="{{ old($field['id'], $user->{$field['id']} ?? 0) }}"
                                                class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-xl h-12 px-5 font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <x-input-error :messages="$errors->get($field['id'])" />
                                     </div>
                                     @endforeach
                                 </div>
@@ -260,6 +264,7 @@
                                         <label for="dette_initiale" class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Dette Initiale Globale</label>
                                         <input id="dette_initiale" name="dette_initiale" type="number" step="0.01" value="{{ old('dette_initiale', $user->dette_initiale ?? 0) }}"
                                                class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-2xl h-14 px-6 font-bold text-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all">
+                                        <x-input-error :messages="$errors->get('dette_initiale')" />
                                         <p class="text-[10px] text-slate-400 italic ml-1">Le point de départ de votre désendettement.</p>
                                     </div>
 
@@ -267,6 +272,7 @@
                                         <label for="objectif_fonds_urgence" class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Cible Fonds d'Urgence</label>
                                         <input id="objectif_fonds_urgence" name="objectif_fonds_urgence" type="number" step="0.01" value="{{ old('objectif_fonds_urgence', $user->objectif_fonds_urgence ?? 500000) }}"
                                                class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-2xl h-14 px-6 font-bold text-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                        <x-input-error :messages="$errors->get('objectif_fonds_urgence')" />
                                         <p class="text-[10px] text-slate-400 italic ml-1">L'épargne de sécurité à bâtir en priorité.</p>
                                     </div>
                                 </div>

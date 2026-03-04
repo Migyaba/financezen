@@ -43,11 +43,12 @@ class BudgetController extends Controller
                 $category = BudgetCategory::where('name', $categoryName)
                     ->where(function($q) { $q->where('user_id', auth()->id())->orWhere('is_default', true); })
                     ->where('type', 'income')
+                    ->orderByRaw('user_id IS NULL ASC') // Prioritize user-specific categories
                     ->first();
                 
                 if ($category) {
                     $item = $budget->items()->where('category_id', $category->id)->first();
-                    if (!$item || $item->amount_planned == 0) {
+                    if (!$item || (float)$item->amount_planned == 0) {
                         $budget->items()->updateOrCreate(
                             ['category_id' => $category->id],
                             ['amount_planned' => $amount]
@@ -60,7 +61,7 @@ class BudgetController extends Controller
         // AUTO-FILL: Préremplir les dépenses fixes depuis le profil
         $fixedExpenses = [
             'Loyer' => auth()->user()->loyer,
-            'Eau + Électricité' => auth()->user()->eau_electricite,
+            'Eau & Électricité' => auth()->user()->eau_electricite,
             'Internet' => auth()->user()->internet,
             'Nourriture' => auth()->user()->nourriture,
             'Essence' => auth()->user()->essence,
@@ -70,11 +71,12 @@ class BudgetController extends Controller
             if ($amount > 0) {
                 $category = BudgetCategory::where('name', $categoryName)
                     ->where(function($q) { $q->where('user_id', auth()->id())->orWhere('is_default', true); })
+                    ->orderByRaw('user_id IS NULL ASC') // Prioritize user-specific categories
                     ->first();
                 
                 if ($category) {
                     $item = $budget->items()->where('category_id', $category->id)->first();
-                    if (!$item || $item->amount_planned == 0) {
+                    if (!$item || (float)$item->amount_planned == 0) {
                         $budget->items()->updateOrCreate(
                             ['category_id' => $category->id],
                             ['amount_planned' => $amount]

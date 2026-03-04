@@ -16,8 +16,9 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'email' => [
+                'sometimes',
                 'required',
                 'string',
                 'lowercase',
@@ -26,7 +27,7 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'phone' => ['nullable', 'string', 'max:20'],
-            'currency' => ['required', 'string', 'max:10'],
+            'currency' => ['sometimes', 'required', 'string', 'max:10'],
             'monthly_salary' => ['nullable', 'numeric', 'min:0'],
             'freelance_split' => ['nullable', 'string', 'regex:/^\d+\/\d+\/\d+$/'], // e.g. 50/30/20
             'loyer' => ['nullable', 'numeric', 'min:0'],
