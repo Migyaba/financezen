@@ -14,7 +14,7 @@ class UserCreatedObserver
     {
         // Create default budget categories for new user
         $defaultCategories = [
-            ['name' => 'Salaire', 'type' => 'income', 'color' => '#10b981', 'icon' => 'briefcase'],
+            ['name' => 'Salaire fixe', 'type' => 'income', 'color' => '#10b981', 'icon' => 'briefcase'],
             ['name' => 'Loyer', 'type' => 'expense', 'color' => '#f59e0b', 'icon' => 'home'],
             ['name' => 'Nourriture', 'type' => 'expense', 'color' => '#ef4444', 'icon' => 'utensils'],
             ['name' => 'Essence', 'type' => 'expense', 'color' => '#3b82f6', 'icon' => 'fuel'],
