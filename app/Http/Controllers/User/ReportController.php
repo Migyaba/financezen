@@ -157,9 +157,9 @@ class ReportController extends Controller
             ->get();
 
         $income = $transactions->where('type', 'income')->sum('amount');
-        $expense = $transactions->where('type', 'expense')->sum('amount');
+        $expense = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
         
-        $categoriesData = $transactions->where('type', 'expense')
+        $categoriesData = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])
             ->groupBy('category_id')
             ->map(function ($row) {
                 return [

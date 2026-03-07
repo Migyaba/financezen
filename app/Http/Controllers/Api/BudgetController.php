@@ -31,10 +31,10 @@ class BudgetController extends Controller
             'freelance_planned' => (float)$budget->freelance_planned,
             'freelance_actual' => (float)$budget->freelance_actual,
             'total_income' => (float)$transactions->where('type', 'income')->sum('amount'),
-            'total_expense' => (float)$transactions->where('type', 'expense')->sum('amount'),
+            'total_expense' => (float)$transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount'),
             'monthly_balance' => (float)(
                 $transactions->where('type', 'income')->sum('amount') -
-                $transactions->where('type', 'expense')->sum('amount')
+                $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount')
             ),
         ]);
     }
@@ -61,7 +61,7 @@ class BudgetController extends Controller
             ->get();
 
         $income = $transactions->where('type', 'income')->sum('amount');
-        $expense = $transactions->where('type', 'expense')->sum('amount');
+        $expense = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
 
         return response()->json([
             'month' => $month,
@@ -71,7 +71,7 @@ class BudgetController extends Controller
             'monthly_balance' => (float)($income - $expense),
             'net_balance' => (float)($income - $expense),
             'expenses_by_category' => $transactions
-                ->where('type', 'expense')
+                ->whereIn('type', ['expense', 'debt_payment', 'savings'])
                 ->groupBy('category_id')
                 ->map(fn($items) => (float)$items->sum('amount'))
                 ->toArray(),

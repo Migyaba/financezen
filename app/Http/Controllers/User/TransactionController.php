@@ -92,6 +92,17 @@ class TransactionController extends Controller
         
         $validated['is_recurring'] = $request->has('is_recurring');
 
+        if ($validated['is_recurring']) {
+            $date = Carbon::parse($validated['transaction_date']);
+            $validated['next_recurring_date'] = match ($validated['recurring_frequency'] ?? 'monthly') {
+                'daily' => $date->addDay(),
+                'weekly' => $date->addWeek(),
+                'monthly' => $date->addMonth(),
+                'yearly' => $date->addYear(),
+                default => $date->addMonth(),
+            };
+        }
+
         $transaction = auth()->user()->transactions()->create($validated);
         
         \Log::info('Transaction created: ID = ' . $transaction->id . ', User = ' . $transaction->user_id);

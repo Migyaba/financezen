@@ -35,7 +35,7 @@ class TransactionController extends Controller
             ->get();
 
         $income = $transactions->where('type', 'income')->sum('amount');
-        $expense = $transactions->where('type', 'expense')->sum('amount');
+        $expense = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
 
         $byCategory = [];
         foreach ($transactions->groupBy('category_id') as $catId => $items) {

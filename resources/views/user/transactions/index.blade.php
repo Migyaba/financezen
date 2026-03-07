@@ -12,11 +12,11 @@
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Dépenses du mois</p>
-                <h4 class="text-lg sm:text-xl font-bold text-danger">{{ number_format($transactions->where('type', 'expense')->sum('amount'), 0, ',', ' ') }} FCFA</h4>
+                <h4 class="text-lg sm:text-xl font-bold text-danger">{{ number_format($transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount'), 0, ',', ' ') }} FCFA</h4>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                 <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Solde Net</p>
-                @php $net = $transactions->where('type', 'income')->sum('amount') - $transactions->where('type', 'expense')->sum('amount'); @endphp
+                @php $net = $transactions->where('type', 'income')->sum('amount') - $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount'); @endphp
                 <h4 class="text-lg sm:text-xl font-bold {{ $net >= 0 ? 'text-primary' : 'text-danger' }}">{{ number_format($net, 0, ',', ' ') }} FCFA</h4>
             </div>
         </div>
@@ -278,8 +278,6 @@
                                 <select name="type" x-model="editData.type" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
                                     <option value="expense">Dépense</option>
                                     <option value="income">Revenu</option>
-                                    <option value="debt_payment">Remboursement Dette</option>
-                                    <option value="savings">Épargne</option>
                                 </select>
                             </div>
                             
@@ -287,7 +285,7 @@
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Catégorie</label>
                                 <select name="category_id" x-model="editData.category_id" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
                                     <optgroup label="── Dépenses ──">
-                                        @foreach($categories->where('type', 'expense') as $category)
+                                        @foreach($categories->where('type', 'expense')->whereNotIn('name', ['Remboursement Dettes', 'Épargne Objectifs']) as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </optgroup>

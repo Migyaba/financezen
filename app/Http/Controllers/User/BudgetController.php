@@ -100,7 +100,7 @@ class BudgetController extends Controller
             ->get();
 
         $incomeTotal = $transactions->where('type', 'income')->sum('amount');
-        $expenseTotal = $transactions->where('type', 'expense')->sum('amount');
+        $expenseTotal = $transactions->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
 
         return view('user.budget.index', compact(
             'budget', 'categories', 'transactions',

@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $expenseThisMonth = $user->transactions()
             ->whereMonth('transaction_date', $now->month)
             ->whereYear('transaction_date', $now->year)
-            ->where('type', 'expense')
+            ->whereIn('type', ['expense', 'debt_payment', 'savings'])
             ->sum('amount');
         $monthlyBalance = $incomeThisMonth - $expenseThisMonth;
 
@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $prevExpense = $user->transactions()
             ->whereMonth('transaction_date', $prevMonth->month)
             ->whereYear('transaction_date', $prevMonth->year)
-            ->where('type', 'expense')->sum('amount');
+            ->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
         $prevBalance = $prevIncome - $prevExpense;
         $balanceTrend = $prevBalance != 0 ? round((($monthlyBalance - $prevBalance) / abs($prevBalance)) * 100) : 0;
 
@@ -43,7 +43,7 @@ class DashboardController extends Controller
         $totalDebt = $user->debts()->where('status', 'active')->sum('current_amount');
         $debtPaidThisMonth = $user->transactions()
             ->whereMonth('transaction_date', $now->month)
-            ->where('type', 'expense')
+            ->whereIn('type', ['expense', 'debt_payment', 'savings'])
             ->sum('amount'); // Simplified
 
         // === KPI 3: Épargne totale ===
@@ -84,7 +84,7 @@ class DashboardController extends Controller
             $chartExpenses[] = $user->transactions()
                 ->whereMonth('transaction_date', $date->month)
                 ->whereYear('transaction_date', $date->year)
-                ->where('type', 'expense')->sum('amount');
+                ->whereIn('type', ['expense', 'debt_payment', 'savings'])->sum('amount');
         }
 
         // === Camembert: Répartition dépenses du mois ===
@@ -92,7 +92,7 @@ class DashboardController extends Controller
             ->with('category')
             ->whereMonth('transaction_date', $now->month)
             ->whereYear('transaction_date', $now->year)
-            ->where('type', 'expense')
+            ->whereIn('type', ['expense', 'debt_payment', 'savings'])
             ->selectRaw('category_id, SUM(amount) as total')
             ->groupBy('category_id')
             ->orderByDesc('total')

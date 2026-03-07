@@ -221,8 +221,6 @@
                                     <select name="type" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 h-12 font-medium focus:ring-primary focus:border-primary">
                                         <option value="expense">Dépense</option>
                                         <option value="income">Revenu</option>
-                                        <option value="debt_payment">Remboursement Dette</option>
-                                        <option value="savings">Épargne</option>
                                     </select>
                                 </div>
                                 
@@ -233,7 +231,7 @@
                                         <option value="new" class="font-bold text-primary">+ Créer une nouvelle catégorie</option>
                                         @isset($globalCategories)
                                         <optgroup label="── Dépenses ──">
-                                            @foreach($globalCategories->where('type', 'expense') as $category)
+                                            @foreach($globalCategories->where('type', 'expense')->whereNotIn('name', ['Remboursement Dettes', 'Épargne Objectifs']) as $category)
                                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                                             @endforeach
                                         </optgroup>

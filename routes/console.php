@@ -16,3 +16,4 @@ Schedule::command('financezen:cleanup-trials-subs')->dailyAt('00:05');
 
 // Envoyer les emails de rappels pour les essais et abonnements (J-3, J-1, etc.)
 Schedule::command('financezen:send-reminders')->dailyAt('08:15');
+Schedule::command('app:process-recurring-transactions')->dailyAt('00:01');

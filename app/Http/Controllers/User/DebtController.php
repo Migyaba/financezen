@@ -101,6 +101,22 @@ class DebtController extends Controller
         }
         $debt->save();
 
+        // Créer une transaction automatiquement
+        $category = auth()->user()->budgetCategories()->firstOrCreate(
+            ['name' => 'Remboursement Dettes', 'type' => 'expense'],
+            ['color' => '#ef4444', 'icon' => 'credit-card']
+        );
+
+        auth()->user()->transactions()->create([
+            'category_id' => $category->id,
+            'type' => 'debt_payment',
+            'amount' => $validated['amount'],
+            'description' => 'Remboursement dette: ' . $debt->name,
+            'transaction_date' => $validated['payment_date'],
+            'payment_method' => 'other',
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
         return back()->with('success', 'Paiement enregistré.');
     }
 }

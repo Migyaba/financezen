@@ -82,6 +82,22 @@ class SavingsController extends Controller
         }
         $saving->save();
 
+        // Créer une transaction automatiquement
+        $category = auth()->user()->budgetCategories()->firstOrCreate(
+            ['name' => 'Épargne Objectifs', 'type' => 'expense'],
+            ['color' => '#10b981', 'icon' => 'piggy-bank']
+        );
+
+        auth()->user()->transactions()->create([
+            'category_id' => $category->id,
+            'type' => 'savings',
+            'amount' => $validated['amount'],
+            'description' => 'Contribution épargne: ' . $saving->name,
+            'transaction_date' => $validated['contribution_date'],
+            'payment_method' => 'other',
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
         return back()->with('success', 'Contribution enregistrée.');
     }
 }
